@@ -1,10 +1,10 @@
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
 
-. ~/dotfiles/bashrc.prexec
-. ~/dotfiles/bashrc.colors
-. ~/dotfiles/bashrc.ssh-agent
-. ~/dotfiles/bashrc.prompt
+. ~/dotfiles/bash/prexec.bash
+. ~/dotfiles/bash/colors.bash
+. ~/dotfiles/bash/ssh-agent.bash
+. ~/dotfiles/bash/prompt.bash
 
 # don't put duplicate lines in the history. See bash(1) for more options
 export HISTCONTROL=ignoredups

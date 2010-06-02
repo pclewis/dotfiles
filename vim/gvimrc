@@ -1,6 +1,25 @@
+let s:os = GetOS()
+let s:host = split(hostname(), '\.')[0]
+
 " colors
 colorscheme candy
 hi Comment guifg=#ff99cc
+
+" font
+if s:os[0] == 'linux'
+  set guifont=DejaVu\ Sans\ Mono\ 10
+elseif s:os[0] == 'macos'
+  set guifont=Andale_Mono:h14
+endif
+
+" window size
+set columns=125
+
+if s:host=='aki'
+  set lines=50
+else
+  set lines=40
+endif
 
 " syntax highlight always on
 syntax on
@@ -30,4 +49,4 @@ set cursorline
 hi User1 guibg=#00FF00 guifg=#000000
 hi User2 guibg=#FF0000 guifg=#000000
 
-call SourceCustomFiles("~/dotfiles/gvimrc")
+call SourceCustomFiles("~/dotfiles/vim/gvimrc")

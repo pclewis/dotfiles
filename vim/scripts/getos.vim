@@ -1,8 +1,16 @@
+let s:os = []
 " Return OS and version/distro, ex:
 "  ['Windows', 'XP']
 "  ['Linux', 'gentoo']
 "  ['MacOS', '10.6']
 function! GetOS()
+  if s:os == []
+    let s:os = s:GetOS()
+  endif
+  return s:os
+endfunction
+
+function! s:GetOS()
   let uname = system('uname')
   if v:shell_error != 0       " Probably Windows
     let ver = system('ver')
