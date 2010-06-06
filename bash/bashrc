@@ -3,8 +3,14 @@
 
 . ~/dotfiles/bash/prexec.bash
 . ~/dotfiles/bash/colors.bash
-. ~/dotfiles/bash/ssh-agent.bash
-. ~/dotfiles/bash/prompt.bash
+. ~/dotfiles/bash/os.bash
+
+if [ -f ~/dotfiles/bash/prompt.$hostname.bash ]
+then . ~/dotfiles/bash/prompt.$hostname.bash
+else . ~/dotfiles/bash/prompt.bash
+fi
+
+[ $hostname = aki ] && . ~/dotfiles/bash/ssh-agent.bash
 
 # don't put duplicate lines in the history. See bash(1) for more options
 export HISTCONTROL=ignoredups
@@ -28,7 +34,7 @@ shopt -s checkwinsize
 #fi
 
 # enable color support of ls and also add handy aliases
-if [ "$TERM" != "dumb" ]; then
+if `which dircolors` && [ "$TERM" != "dumb" ]; then
     eval "`dircolors -b`"
     alias ls='ls --color=auto'
 fi
@@ -41,9 +47,8 @@ alias dc=cd
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
 # sources /etc/bash.bashrc).
-if [ -f /etc/bash_completion ]; then
-    . /etc/bash_completion
-fi
+[ -f /etc/bash_completion ] && . /etc/bash_completion
+[ -f /etc/profile.d/bash-completion.sh ] && . /etc/profile.d/bash-completion.sh
 
 #export CSCOPE_DB=
 
@@ -53,9 +58,11 @@ export LC_ALL="en_US.UTF-8"
 export HISTSIZE=50000
 #export HISTTIMEFORMAT="%m-%d %H:%M"
 
-shopt -s autocd    # executing a dir cds into it
-shopt -s globstar  # enable **
-shopt -s dirspell  # fix dir spelling in tab completion
+if [ $BASH_VERSINFO -gt 3 ]; then
+	shopt -s autocd    # executing a dir cds into it
+	shopt -s globstar  # enable **
+	shopt -s dirspell  # fix dir spelling in tab completion
+fi
 
 #export PROMPT_DIRTRIM=5
 
@@ -86,10 +93,7 @@ export PATH=$PATH:~/grails/bin
 export GWT_HOME=~/Downloads/gwt-linux-1.7.1
 
 # ccache
-if [ -d /usr/lib/ccache/bin ]
-then export PATH=/usr/lib/ccache/bin:$PATH
-fi
+[ -d /usr/lib/ccache/bin ] && export PATH=/usr/lib/ccache/bin:$PATH
 
 export FIGNORE=.svn:.git
 
-source /etc/profile.d/bash-completion.sh
