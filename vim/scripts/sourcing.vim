@@ -1,6 +1,5 @@
 function! SourceIfExists(file)
   let file = expand(a:file)
-  echomsg file
   if file_readable(file)
     exec 'source' file
   endif

@@ -1,9 +1,14 @@
+source ~/dotfiles/vim/scripts/getos.vim
+source ~/dotfiles/vim/scripts/sourcing.vim
+
 let s:os = GetOS()
 let s:host = split(hostname(), '\.')[0]
 
 " colors
-colorscheme candy
-hi Comment guifg=#ff99cc
+" colorscheme candy
+" hi Comment guifg=#ff99cc
+colors molokai
+hi SpecialKey guifg=#2b2d2e
 
 " font
 if s:os[0] == 'linux'
