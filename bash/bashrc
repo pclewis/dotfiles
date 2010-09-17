@@ -96,4 +96,4 @@ export GWT_HOME=~/Downloads/gwt-linux-1.7.1
 [ -d /usr/lib/ccache/bin ] && export PATH=/usr/lib/ccache/bin:$PATH
 
 export FIGNORE=.svn:.git
-
+export GRAILS_HOME=~/grails

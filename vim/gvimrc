@@ -6,9 +6,7 @@ let s:host = split(hostname(), '\.')[0]
 
 " colors
 " colorscheme candy
-" hi Comment guifg=#ff99cc
 colors molokai
-hi SpecialKey guifg=#2b2d2e
 
 " font
 if s:os[0] == 'linux'
@@ -53,5 +51,8 @@ set cursorline
 
 hi User1 guibg=#00FF00 guifg=#000000
 hi User2 guibg=#FF0000 guifg=#000000
+
+" hi Comment guifg=#ff99cc " candy
+hi SpecialKey guifg=#303233 " tab markers, molokai
 
 call SourceCustomFiles("~/dotfiles/vim/gvimrc")

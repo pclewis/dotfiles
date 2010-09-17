@@ -1,21 +1,19 @@
 #!/bin/bash
 
-BTL="╭"
-BAR="─"
-BCL="┤"
-BCR="├"
-BBL="╰"
-BBR="╯"
+# ╒╡ \$USER@\$HOSTNAME ╞═
+PROMPT_1L="<15>╒<22><_001>╡ <M>\$USER<c>@<G>\$HOSTNAME<22> ╞<_k><15>═<11>"
+PROMPT_1LD="<15>╒<22>╡ <m>\$USER<c>@<g>\$HOSTNAME<22> ╞<15>═<11>"
+PROMPT_2L="<15>└<22>┶<18>━<16>━<12>╾<8>╼ <x>"
+PROMPT_1R="<15>═<22><_001>╡ <M>\$PPWD <22>╞<_k><15>═<22><_001>╡ <C>\$DATE <22>╞<_k><15>╸"
+PROMPT_1RD="<15>═<22>╡ <m>\$PPWD <22>╞<_k><15>═<22>╡ <c>\$DATE <22>╞<_k><15>╕"
+PROMPT_2R="╾╼━━┵┘"
+FILLSRC="═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════"
 
-USERCOLOR=$EMC
-HOSTCOLOR=$EMC
-
-PROMPT_1L="^K^╭──_b_┤^C^\$USER@\${HOSTNAME}^K^├_k_─\$STATUS"
-PROMPT_2L="^K^╰──┴──►^G^"
-PROMPT_1LD="^K^╭──┤^c^_k_\$USER@\${HOSTNAME}_k_^K^├─"
-PROMPT_1R="^K^_b_┤^M^\${PPWD}^K^├_k_───_b_┤^C^\${DATE}^K^├_k_╼"
-PROMPT_1RD="^K^┤^m^\$PPWD^K^├───┤^K^\$DATE^K^├╼╮"
-PROMPT_2LS=`echo "$PROMPT_2L" | ~/color strip`
+# Fix tput for screen
+TPUT="tput"
+if [ $TERM == 'screen' ]; then
+	TPUT="tput -Trxvt"
+fi
 
 # Function to set tab title
 function set_title()
@@ -26,7 +24,6 @@ function set_title()
 	echo -ne "\a" > /dev/stderr
 }
 
-FILLSRC="───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────"
 
 function prompt_command()
 {
@@ -45,14 +42,13 @@ function prompt_command()
 
 	DATE=$(date +'%H:%M:%S')
 	#   Add all the accessories below ...
-	local LL=`eval echo "$PROMPT_1L"`
-	local L=`echo $LL | ~/color strip`
-	local RR=`eval echo "$PROMPT_1R"`
-	local R=`echo $RR | ~/color strip`
+	local L=$(eval echo $(colorize strip "$PROMPT_1L"))
+	local R=$(eval echo $(colorize strip "$PROMPT_1R"))
+
 
 	STATUS=`echo "$STATUS" | ~/color`
 
-	let fillsize=${COLUMNS}-${#L}-${#R}-1
+	let fillsize=${COLUMNS}-${#L}-${#R}
 	if [ "$fillsize" -gt "0" ]
 	then
 		fill="${FILLSRC:0:${fillsize}}"
@@ -64,38 +60,53 @@ function precmd() {
 }
 
 function preexec () {
-	tput sc
+	# Save cursor position
+	$TPUT sc
 
+	# Determine how many lines down the command input put us
 	local x=$@
 	local lines=$((2 + ${#x}/${COLUMNS}))
-	tput cuu $lines
-	DATE=$(date +'%H:%M:%S')
-	tput hpa 0
-	local LLD=`eval echo "$PROMPT_1LD"`
-	echo -n $LLD | ~/color
-	local RRD=`eval echo "$PROMPT_1RD"`
-	local RD=`echo $RRD | ~/color strip`
-	local c=$(($COLUMNS-${#RD}))
-	tput hpa $c
-	echo -n $RRD | ~/color
-	tput cud1
+	$TPUT cuu $lines
 
+	DATE=$(date +'%H:%M:%S')
+
+	# Fade out old prompt
+	$TPUT hpa 0
+	echo -n $(colorize $(eval echo "\"$PROMPT_1LD\""))
+	local RD=$(colorize strip $(eval echo "\"$PROMPT_1RD\""))
+	local c=$(($COLUMNS-${#RD}))
+	$TPUT hpa $c
+	echo -n $(colorize $(eval echo "\"$PROMPT_1RD\""))
+	$TPUT cud1
+
+	# If command was less than one line, fill in space to the right
 	if [[ ${#x} -lt ${COLUMNS} ]]
 	then
-		local fillsize=$((${COLUMNS}-${#x}-${#PROMPT_2LS}-2))
-		if [ "$fillsize" -gt "0" ]
-		then
-			fill="${FILLSRC:0:${fillsize}}"
-		fi
-		local c=$(($COLUMNS-$fillsize-2))
-		tput hpa $c
-		#echo -n "$c-${COLUMNS}-${x}-${#PROMPT_2LS}"
-		echo -n "◄$fill╯"
+		#local fillsize=$((${COLUMNS}-${#x}-${#PROMPT_2R}-2))
+		#if [ "$fillsize" -gt "0" ]
+		#then
+		#	fill="${FILLSRC:0:${fillsize}}"
+		#fi
+		local c=$(($COLUMNS-${#PROMPT_2R}))
+		$TPUT hpa $c
+		echo -n $PROMPT_2R
 	fi
-	tput rc
-	echo -n -e $CLR
+
+	# Restore cursor
+	$TPUT rc
+
   set_title
+
+	# Re-output cmd invisibly for copy+paste ease
+	PPWD=${PWD/$HOME/\~}
+	echo -en $(clr 1)
+	echo "($(date +'%Y-%m-%d %H:%M:%S')) $PPWD% $@"
+
+	# Reset color
+	echo -ne $CLR
+
+
 }
 
-export PS1="\[$(echo $PROMPT_1L | ~/color)\${fill}$(echo $PROMPT_1R | ~/color)\]\n$(echo $PROMPT_2L | ~/color bash)"
+export PS1="\[\n$(colorize "$PROMPT_1L")\${fill}$(colorize "$PROMPT_1R")\]\n$(colorize strip "$PROMPT_2L")"
 preexec_install
