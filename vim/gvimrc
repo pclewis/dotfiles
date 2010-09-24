@@ -24,23 +24,12 @@ else
   set lines=40
 endif
 
-" syntax highlight always on
-syntax on
-
-"antialias font
-set antialias
-
-" line numbers
-set number
-
-" no toolbar
-set guioptions-=T
-
-" horizontal scoll bar
-set guioptions+=b
-
-" copy to clipboard
-set cb=unnamed
+syntax on         " syntax highlight always on
+set antialias     " antialias font
+set number        " line numbers
+set guioptions-=T " no toolbar
+set guioptions-=b " no horizontal scoll bar
+set cb=unnamed    " copy to clipboard
 
 " subtle color of current line/col
 hi CursorLine guibg=#202020

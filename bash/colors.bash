@@ -34,6 +34,10 @@ BGM="\033[45m"
 BGC="\033[46m"
 BGW="\033[47m"
 
+debug() {
+	echo "$*" >&2
+}
+
 # 256 color support
 # clr
 #   reset to default color
@@ -101,7 +105,8 @@ colorize() {
 
 	local result=$*
 	local fo="<" fc=">" bo="<_" bc=">"
-	local PRE=$(echo -ne '\033[')
+	local ESC=$(echo -ne '\033')
+	local PRE="$ESC["
 	local BOLD='1;' NRM='22;' FG='3' BG='4' EXT='8;5;' END='m' RST='0'
 
 	if [ $mode == 'strip' ]; then
@@ -142,7 +147,126 @@ colorize() {
 		result=${result//$bo$w$bc/$PRE$BG$EXT$n$END}
 	done
 
+	# strip full ansi colors as well
+	if [ $mode == 'strip' ]; then
+		result=${result//$ESC[?m/}
+		result=${result//$ESC[??m/}
+		result=${result//$ESC[??;?m/}
+		result=${result//$ESC[??;??m/}
+		result=${result//$ESC[??;?;?m/}
+		result=${result//$ESC[??;?;??m/}
+		result=${result//$ESC[??;?;???m/}
+	fi
+
 	result=${result//${fo}x${fc}/$PRE$RST$END}
 
 	echo -n "$result"
+}
+
+# divide rounded up
+dru() {
+	if [ $(($1 % $2)) -gt 0 ]; then
+		echo $(($1 / $2 + 1))
+	else
+		echo $(($1 / $2))
+	fi
+}
+
+# scatter str input [input ...]
+#   Distribute input evenly throughout str
+# ex:
+#   scatter 123456789 a b c
+#    result: a1234b5678c9
+scatter() {
+	str="$1"
+	shift
+
+	local strlen=${#str} inputlen=$(($#))
+	if [ $inputlen -gt $strlen ]; then
+		step=1
+		istep=$(dru $inputlen $strlen)
+	else
+		step=$(($strlen/$inputlen))
+		istep=1
+	fi
+
+	#debug "step=$step istep=$istep strlen=$strlen inputlen=$inputlen"
+
+	local sp=0 i=1 result=''
+
+	while [[ $sp -lt $strlen ]]; do
+		result="${result}${!i}${str:$sp:$step}"
+		sp=$(($sp+$step))
+		i=$(($i+$istep))
+	done
+
+	echo "$result"
+}
+
+# makerange invert radial min max
+#   return a range of numbers from min to max
+#   if invert is true: swap min and max
+#   if radial is true: return min..max..min
+makerange() {
+	local invert=$1 radial=$2 min=$3 max=$4
+	if $invert; then min=$4; max=$3; fi
+
+	first=($(eval echo {$min..$max}))
+	last=()
+	if $radial; then
+		if [ $max -eq $min ]; then
+			last=($max)
+		else
+			nmax=${first[$((${#first[@]}-2))]} # nmax=first[-2] bash arrays are fun
+			last=($(eval echo {$nmax..$min}))
+		fi
+	fi
+
+	echo ${first[@]} ${last[@]}
+}
+
+# gradient str [bg|invert|radial] minw maxw
+# gradient str [bg|invert|radial] minr maxr ming maxg minb maxb
+#  Evenly fade colors through string
+gradient() {
+	local str="$1"
+	shift
+	local clr="clr" invert=false radial=false
+
+	while true; do
+		case $1 in
+			bg) clr="clr bg"; shift;;
+			invert) invert=true; shift;;
+			radial) radial=true; shift;;
+			*) break;;
+		esac
+	done
+
+	if [ $# -eq 2 ]; then
+		range=$(makerange $invert $radial $1 $2)
+		#debug "Range= $range"
+		echo $(scatter "$str" $(for c in $range; do echo "$($clr $c)"; done)) $(clr)
+	elif [ $# -eq 6 ]; then
+		ranger=($(makerange $invert $radial $1 $2))
+		rangeg=($(makerange $invert $radial $3 $4))
+		rangeb=($(makerange $invert $radial $5 $6))
+		max=${#ranger[@]}
+		if [ ${#rangeg[@]} -gt $max ]; then max=${#rangeg[@]}; fi
+		if [ ${#rangeb[@]} -gt $max ]; then max=${#rangeb[@]}; fi
+		stepr=$(dru $max ${#ranger[@]})
+		stepg=$(dru $max ${#rangeg[@]})
+		stepb=$(dru $max ${#rangeb[@]})
+		local i=1 ir=0 ig=0 ib=0
+		colors=()
+		while [[ $i -le $max ]]; do
+			colors=(${colors[@]} $($clr ${ranger[$ir]} ${rangeg[$ig]} ${rangeb[$ib]}))
+			#debug "${ranger[$ir]} ${rangeg[$ig]} ${rangeb[$ib]}"
+			if [ $(($i % $stepr)) -eq 0 ]; then ir=$(($ir+1)); fi
+			if [ $(($i % $stepg)) -eq 0 ]; then ig=$(($ig+1)); fi
+			if [ $(($i % $stepb)) -eq 0 ]; then ib=$(($ib+1)); fi
+			i=$(($i+1))
+		done
+		#debug "max=$max stepr=$stepr stepg=$stepg stepb=$stepb colors=${colors[@]}"
+		scatter "$str" ${colors[@]}
+	fi
 }
