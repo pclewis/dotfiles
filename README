@@ -1,1 +1,5 @@
-Dot files.
+Install/update submodules:
+git submodule update --init --recursive
+
+Create symlinks:
+stow emacs zsh
