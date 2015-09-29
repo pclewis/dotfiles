@@ -1,0 +1,146 @@
+URxvt.cursorColor:  #ff99cc
+URxvt.cursorBlink: true
+URxvt.pointerColor: #ff99cc
+#URxvt.depth:            32
+#URxvt.background:   [94]#000000
+URxvt.background:   #000000
+URxvt.foreground:   gray90
+#URxvt.color0:   [94]#000000
+#URxvt.color0:   #000000
+#URxvt.color1:   #A80000
+#URxvt.color2:   #00A800
+#URxvt.color3:   #A8A800
+#URxvt.color4:   #0000A8
+#URxvt.color5:   #A84074
+#URxvt.color5:   #A800A8
+#URxvt.color6:   #0074A8
+#URxvt.color6:   #00A8A8
+#URxvt.color7:   #A8A8A8
+
+#URxvt.color8:   #343434
+#URxvt.color9:   #FF0054
+#URxvt.color10:  #00FF54
+#URxvt.color11:  #FFFF54
+#URxvt.color12: #1144FF
+#URxvt.color12:  #0000FF
+#URxvt.color13:  #FF00FF
+#URxvt.color13:  #FF99CC
+#URxvt.color14:  #00FFFF
+#URxvt.color14:  #00CCFF
+#URxvt.color15:  #FFFFFF
+
+URxvt.scrollstyle:      plain
+URxvt.secondaryScroll:  true
+URxvt.scrollBar_right: true
+#URxvt.fading:                   35
+URxvt.saveLines:                65535
+
+URxvt.iconName:                 terminal
+URxvt.termName:                 xterm-256color
+URxvt.geometry:                 160x30
+
+#urxvt.font:                            xft:DejaVu Sans Mono-8:autohint=true:antialias=true
+
+#urxvt.font: xft:Andale Mono-10:autohint=true:antialias=true
+#urxvt.boldFont: xft:Andale Mono-10:autohint=true:antialias=true
+
+#urxvt.font: xft:Inconsolata-10:autohint=true:antialias=true
+
+#urxvt.font: xft:ProggyCleanTT-12:antialias=true
+urxvt.font: xft:Input Mono:size=12:antialias=true
+#urxvt.font: xft:Input Mono Compressed:antialias=true
+#urxvt.font: xft:Input Mono:pixelsize=19
+#urxvt.font: xft:Input Mono Compressed:antialias=true,xft:Input Mono Compressed
+
+
+
+# Tiny font
+#urxvt.font: xft:ProggyTinyTT-12:autohint=false:antialias=true,xft:DejaVu Sans Mono:antialias=true:autohint=true
+#urxvt.boldFont: xft:ProggyTinyTT-12:autohint=false:antialias=true
+
+lcd.font: xft:Andale Mono-12:autohint=true:antialias=true
+lcd.boldFont: xft:Andale Mono-12:autohint=true:antialias=true
+
+lcdh.font: xft:Andale Mono-10:autohint=true:antialias=true
+lcdh.boldFont: xft:Andale Mono-10:autohint=true:antialias=true
+
+#urxvt.font:                            xft:DejaVu Sans Mono-8:autohint=true
+#urxvt.boldFont:         xft:DejaVu Sans Mono-8:bold:autohint=true
+#urxvt.italicFont:       xft:DejaVu Sans Mono-8:italic:autohint=true
+#urxvt.boldItalicFont:   xft:DejaVu Sans Mono-8:bold:italic:autohint=true
+
+IRC*font:                               xft:DejaVu Sans Mono-6:antialias=false
+IRC*boldFont:           xft:DejaVu Sans Mono-6:bold:antialias=false
+IRC*italicFont:         xft:DejaVu Sans Mono-6:italic:antialias=false
+IRC*boldItalicFont:     xft:DejaVu Sans Mono-6:bold:italic:antialias=false
+
+small*font:                             xft:DejaVu Sans Mono-6:antialias=false
+small*boldFont:                 xft:DejaVu Sans Mono-6:bold:antialias=false
+small*italicFont:               xft:DejaVu Sans Mono-6:italic:antialias=false
+small*boldItalicFont:           xft:DejaVu Sans Mono-6:bold:italic:antialias=false
+
+#lcd*font:                              xft:DejaVu Sans Mono-12:antialias=true
+#lcd*boldFont:          xft:DejaVu Sans Mono-12:bold:antialias=true
+#lcd*italicFont:        xft:DejaVu Sans Mono-12:italic:antialias=true
+#lcd*boldItalicFont:    xft:DejaVu Sans Mono-12:bold:italic:antialias=true
+
+lcdbig*font:                            xft:DejaVu Sans Mono-14:antialias=true
+lcdbig*boldFont:                xft:DejaVu Sans Mono-14:bold:antialias=true
+lcdbig*italicFont:              xft:DejaVu Sans Mono-14:italic:antialias=true
+lcdbig*boldItalicFont:          xft:DejaVu Sans Mono-14:bold:italic:antialias=true
+
+test*depth:32
+test*background:rgba:0000/0000/0000/aaaa
+
+
+#URxvt.keysym.M-u: perl:mark-yank-urls:activate_mark_mode
+#URxvt.underlineURLs: true
+#URxvt.perl-lib: /home/pcl/.urxvt/
+#URxvt.perl-ext: readline,mark-yank-urls,searchable-scrollback
+#URxvt.urlLauncher: /home/pcl/firefox.sh
+#URxvt.keysym.0xff14: perl:urxvi
+
+
+URxvt.perl-ext-common: clipboard,keyboard-select,url-select
+URxvt.keysym.M-c: perl:clipboard:copy
+URxvt.keysym.M-v: perl:clipboard:paste
+URxvt.keysym.M-C-v: perl:clipboard:paste_escaped
+URxvt.keysym.M-Escape: perl:keyboard-select:activate
+URxvt.keysym.M-s: perl:keyboard-select:search
+URxvt.keysym.M-u: perl:url-select:select_next
+
+URxvt.url-select.autocopy: true
+URxvt.url-select.launcher: /home/pcl/firefox.sh
+URxvt.url-select.underline: true
+
+
+
+!! Colors of Thayer, found via Daisuke_Aramaki and based on Monokai
+! Black
+*color0: #262729
+*color8: #554444
+! Red
+*color1: #F92671
+*color9: #F92671
+!*color9: #FF669D
+! Green
+*color2: #A6E22E
+*color10: #A6E22E
+!*color10: #BEED5F
+! Yellow
+*color3: #FD971F
+*color11: #FD971F
+!*color11: #E6DB74
+! Blue
+*color4: #66D9EF
+*color12: #66D9EF
+! Magenta
+*color5: #9E6FFE
+*color13: #9E6FFE
+! Cyan
+*color6: #5E7175
+*color14: #A3BABF
+! White
+!*color7: #CCCCC6
+*color7: #F8F8F2
+*color15: #F8F8F2
