@@ -162,7 +162,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     --, ((mod1Mask .|. controlMask, xK_q     ), spawn "xmonad --recompile; xmonad --restart")
 
     -- Lock screen
-    , ((mod1Mask .|. controlMask, xK_l ), spawn "/usr/bin/xscreensaver-command -lock")
+    , ((mod1Mask .|. controlMask, xK_l ), spawn "xscreensaver-command -lock")
 
     -- swap clip/primary
     , ((modm .|. shiftMask, xK_v     ), spawn "/home/pcl/swapbuf.sh")
