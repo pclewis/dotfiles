@@ -159,11 +159,17 @@ before layers configuration."
   ;; User initialization goes here
   )
 
-(defun dotspacemacs/config ()
+(defun dotspacemacs/user-config ()
   "Configuration function.
  This function is called at the very end of Spacemacs initialization after
 layers configuration."
   (setq clojure-enable-fancify-symbols t)
+  (define-key evil-insert-state-map (kbd "<C-right>")   'sp-forward-slurp-sexp)
+  (define-key evil-insert-state-map (kbd "<C-S-right>") 'sp-forward-sexp)
+  (define-key evil-insert-state-map (kbd "<C-S-left>")  'sp-backward-sexp)
+  (define-key evil-insert-state-map (kbd "<M-up>")      'sp-raise-sexp)
+  (add-hook 'clojure-mode-hook #'smartparens-strict-mode)
+
 )
 
 ;; Do not write anything past this comment. This is where Emacs will
