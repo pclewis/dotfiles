@@ -47,7 +47,7 @@ URxvt.geometry:                 160x30
 #urxvt.font: xft:Inconsolata-10:autohint=true:antialias=true
 
 #urxvt.font: xft:ProggyCleanTT-12:antialias=true
-urxvt.font: xft:Input Mono:size=12:antialias=true
+urxvt.font: xft:Input Mono:size=12:antialias=true,xft:Unifont:size=9
 #urxvt.font: xft:Input Mono Compressed:antialias=true
 #urxvt.font: xft:Input Mono:pixelsize=19
 #urxvt.font: xft:Input Mono Compressed:antialias=true,xft:Input Mono Compressed
