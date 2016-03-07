@@ -36,7 +36,7 @@
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages then consider to create a layer, you can also put the
    ;; configuration in `dotspacemacs/config'.
-   dotspacemacs-additional-packages '()
+   dotspacemacs-additional-packages '(evil-terminal-cursor-changer)
    ;; A list of packages and/or extensions that will not be install and loaded.
    dotspacemacs-excluded-packages '()
    ;; If non-nil spacemacs will delete any orphan packages, i.e. packages that
@@ -165,12 +165,33 @@ before layers configuration."
 layers configuration."
   (setq clojure-enable-fancify-symbols t)
   (define-key evil-insert-state-map (kbd "<C-right>")   'sp-forward-slurp-sexp)
+  (define-key evil-insert-state-map (kbd "<C-left>")    'sp-forward-barf-sexp)
   (define-key evil-insert-state-map (kbd "<C-S-right>") 'sp-forward-sexp)
   (define-key evil-insert-state-map (kbd "<C-S-left>")  'sp-backward-sexp)
   (define-key evil-insert-state-map (kbd "<M-up>")      'sp-raise-sexp)
-  (add-hook 'clojure-mode-hook #'smartparens-strict-mode)
 
-)
+  (add-hook 'clojure-mode-hook #'smartparens-strict-mode)
+  (add-hook 'clojure-mode-hook (lambda ()
+                                 (define-clojure-indent
+                                   (fact 'defun)
+                                   (facts 'defun)
+                                   (fact-group 'defun)
+                                   (silent-fact 'defun)
+                                   (future-fact 'defun)
+                                   (tabular 'defun)
+                                   (against-background 'defun)
+                                   (provided 0))))
+
+  (setenv "PATH" (concat (getenv "PATH") ":/run/current-system/sw/bin"))
+  (setq exec-path (append exec-path '("/run/current-system/sw/bin")))
+
+  (setq cider-cljs-lein-repl "(do (use 'figwheel-sidecar.repl-api) (start-figwheel!) (cljs-repl))")
+
+  (unless (display-graphic-p)
+    (progn
+      (require 'evil-terminal-cursor-changer)
+      (setq powerline-default-separator 'utf-8)
+      (xterm-mouse-mode -1))))
 
 ;; Do not write anything past this comment. This is where Emacs will
 ;; auto-generate custom variable definitions.
