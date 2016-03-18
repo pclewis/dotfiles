@@ -7,7 +7,7 @@ W=$4
 COLS=$(($W / $FW))
 INFO=$(cat ~/.xmonad/xmonad.hs \
      | awk '/^'"$KEYMAP"'/,/^\s*\]$/' \
-     | head -n -1 \
+     | grep '(".*",.*)$' \
      | sed -r 's/^.*?[,\[] \("([^"]+)",(\s*)(.*)\)/^fg(purple)\1\2^fg(white)\3/' \
      | column -c $COLS \
      | expand \
