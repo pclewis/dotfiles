@@ -25,6 +25,10 @@ import XMonad.Layout.Grid
 import XMonad.Layout.TwoPane
 import XMonad.Layout.ThreeColumns
 import XMonad.Layout.Column
+import XMonad.Actions.UpdatePointer
+import XMonad.Actions.Submap
+import XMonad.Actions.ShowText
+import XMonad.Util.Run
 
 
 import qualified XMonad.StackSet as W
@@ -77,8 +81,8 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     -- launch dmenu
     , ((modm,               xK_p     ), spawn "dmenu_run")
 
-    ---- launch gmrun
-    , ((modm .|. shiftMask, xK_p     ), spawn "gmrun")
+    ---- window switcher
+    , ((modm .|. shiftMask, xK_p     ), spawn "wmctrl -l | cut -d' ' -f 5- | sort | uniq -u | dmenu -i | xargs -I 'WIN' wmctrl -F -a WIN")
 
     ---- close focused window
     , ((modm .|. shiftMask, xK_c     ), kill)
@@ -94,6 +98,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
 
     -- Move focus to the next window
     , ((modm,               xK_Tab   ), windows W.focusDown)
+    , ((modm .|. shiftMask, xK_Tab   ), windows W.focusUp)
 
     -- h/j/k/l keys added by withWindowNavigation
     ---- Move focus to the next window
@@ -109,10 +114,10 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     --, ((modm,               xK_l     ), windows W.focusDown )
 
     ---- Move focus to the master window
-    --, ((modm,               xK_m     ), windows W.focusMaster  )
+    , ((modm,               xK_m     ), windows W.focusMaster  )
 
     ---- Swap the focused window and the master window
-    --, ((modm,               xK_Return), windows W.swapMaster)
+    , ((modm .|. shiftMask, xK_m     ), windows W.swapMaster)
 
     ---- Swap the focused window with the next window
     --, ((modm .|. shiftMask, xK_j     ), windows W.swapDown  )
@@ -183,6 +188,16 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     , ((modm .|. mod1Mask,  xK_equal ), layoutSplitScreen 3 $ Mirror $ Tall 1 (3/100) (3/4))
     , ((modm .|. shiftMask,  xK_equal ), layoutSplitScreen 3 $ ThreeColMid 1 (3/100) (1/2))
    -- , ((modm .|. mod1Mask,  xK_equal ), layoutSplitScreen 5 $ Mirror $ ThreeColMid 1 (3/100) (1/2))
+    , ((modm, xK_w),
+       runProcessWithInputAndWait "dmenu" [] "hi" 0
+       >>= \_ ->
+        (submap . M.fromList $
+         [ ((0, xK_f), spawn "wmctrl -a Vimperator")
+         , ((0, xK_e), spawn "wmctrl -a emacs")
+         , ((0, xK_w), spawn "wmctrl -a Weechat")
+         , ((0, xK_c), spawn "wmctrl -a Chromium")
+         ])
+      )
     ]
     ++
 
@@ -204,11 +219,10 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     --
     -- Same thing, for numpad
     --
-    [((m .|. modm, k), windows $ f i)
-        | (i, k) <- zip (XMonad.workspaces conf) numPadKeys
-        , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]]
-
-   ++
+    --[((m .|. modm, k), windows $ f i)
+--        | (i, k) <- zip (XMonad.workspaces conf) numPadKeys
+--        , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]]
+--   ++
     --
     -- mod-[asdfg], Switch to workspace N
     -- mod-shift-[asdfg], Move client to workspace N
@@ -216,7 +230,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     [((m .|. modm, k), windows $ f i)
         | (i, k) <- zip (XMonad.workspaces conf) [xK_a, xK_s, xK_d, xK_f, xK_g]
         , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]]
-    ++
+--    ++
 
     -- numpad on xquartz
     --[((m .|. modm, k), windows $ f i)
@@ -235,9 +249,9 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
 -- mod-{w,e,r}, Switch to physical/Xinerama screens 1, 2, or 3
 -- mod-shift-{w,e,r}, Move client to screen 1, 2, or 3
 --
-    [((m .|. modm, key), screenWorkspace sc >>= flip whenJust (windows . f))
-       | (key, sc) <- zip [xK_w, xK_e, xK_r] [0..]
-       , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
+--    [((m .|. modm, key), screenWorkspace sc >>= flip whenJust (windows . f))
+--       | (key, sc) <- zip [xK_w, xK_e, xK_r] [0..]
+--       , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
 
 -- Non-numeric num pad keys, sorted by number
 numPadKeys = [ xK_KP_End,  xK_KP_Down,  xK_KP_Page_Down -- 1, 2, 3
@@ -322,7 +336,8 @@ myManageHook = composeAll
 -- return (All True) if the default handler is to be run afterwards. To
 -- combine event hooks use mappend or mconcat from Data.Monoid.
 --
-myEventHook = mempty
+myEventHook = handleTimerEvent
+--mempty
 
 ------------------------------------------------------------------------
 -- Status bars and logging
@@ -330,7 +345,9 @@ myEventHook = mempty
 -- Perform an arbitrary action on each internal state change or X event.
 -- See the 'XMonad.Hooks.DynamicLog' extension for examples.
 --
-myLogHook = fadeInactiveLogHook 0.90 -- <+> takeTopFocus -- return ()
+myLogHook = (fadeInactiveLogHook 0.80)
+            >> updatePointer (0.5, 0.5) (0, 0)
+ -- <+> takeTopFocus -- return ()
 
 ------------------------------------------------------------------------
 -- Startup hook
