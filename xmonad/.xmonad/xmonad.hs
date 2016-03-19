@@ -132,6 +132,13 @@ masterKeymap = [ ("f",   windows W.focusMaster)
   where incMaster       = sendMessage (IncMasterN 1)
         decMaster       = sendMessage (IncMasterN (-1))
 
+screenKeymap = [ ("0", rescreen)
+               , ("2", layoutSplitScreen 2 $ TwoPane (3/100) (1/2))
+               , ("3", layoutSplitScreen 3 $ ThreeColMid 1 (3/100) (1/2))
+               , ("4", layoutSplitScreen 4 Grid)
+               , ("5", layoutSplitScreen 5 $ ThreeColMid 1 (3/100) (1/2))
+               ]
+
 mainKeymap c = mkKeymap c $
     [ ("M-S-<Return>", spawn myTerminal)
     , ("M-p",          spawn "dmenu_run")
@@ -148,6 +155,7 @@ mainKeymap c = mkKeymap c $
     , ("M-w",          toSubmap c "focusKeymap" focusKeymap)
     , ("M-m",          toSubmap c "musicKeymap" musicKeymap)
     , ("M-a",          toSubmap c "masterKeymap" masterKeymap)
+    , ("M-=",          toSubmap c "screenKeymap" screenKeymap)
     , ("M-S-/",        toSubmap c "mainKeymap" [])
     ]
   where nextWindow      = windows W.focusDown
