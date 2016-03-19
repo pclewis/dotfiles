@@ -97,7 +97,10 @@ keyMapDoc name = do
   return handle
 
 toSubmap :: XConfig l -> String -> [(String, X ())] -> X ()
-toSubmap c name m = keyMapDoc name >>= \pipe -> (submap (mkKeymap c m)) >> io (hClose pipe)
+toSubmap c name m = do
+  pipe <- keyMapDoc name
+  submap $ mkKeymap c m
+  io $ hClose pipe
 
 -- Note: Formatting is important for script
 focusKeymap = [ ("f", focus "Vimperator")

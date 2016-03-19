@@ -14,11 +14,11 @@ INFO=$(cat ~/.xmonad/xmonad.hs \
      | sed 's/^/    /' )
 echo "$INFO"
 N_LINES=$(wc -l <<< "$INFO")
-Y=$(($3 + $5 - ($LH * ($N_LINES+2))))
-(echo "^fg(purple)$KEYMAP ($2 , $3 , $4 , $5, $LH, $X, $Y, $W, $N_LINES, $COLS )"
+Y=$(($3 + $5 - ($LH * ($N_LINES+3))))
+sleep 1
+# $KEYMAP ($2 , $3 , $4 , $5, $LH, $X, $Y, $W, $N_LINES, $COLS
+(echo "^fg(purple)$KEYMAP"
+ echo ""
  echo "$INFO"
  echo ""
- sleep 1
- echo '^unhide()'
- echo '^uncollapse()'
- cat) | dzen2 -l $(($N_LINES+1)) -h $LH -x $X -y $Y -w $W -e "onstart=hide"
+ cat) | dzen2 -l $(($N_LINES+2)) -h $LH -x $X -y $Y -w $W -e onstart=uncollapse
