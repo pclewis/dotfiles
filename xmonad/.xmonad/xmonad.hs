@@ -110,9 +110,12 @@ focusKeymap = [ ("f", focus "Vimperator")
               , ("m", windows W.focusMaster)
               , ("/", spawn menu)
               ]
-  where focus :: String -> X ()
-        focus w = spawn ("wmctrl -a " ++ w)
-        menu = "wmctrl -l | cut -d' ' -f 5- | sort | uniq -u | dmenu -i | xargs -I 'WIN' wmctrl -F -a WIN"
+  -- Firefox is sometimes reluctant to give up keyboard focus.
+  -- Calling wmctrl twice seems to make it cooperate.
+  where focus' :: String -> X ()
+        focus' w = spawn ("wmctrl -a " ++ w)
+        focus w = focus' w >> focus' w
+        menu = "wmctrl -l | cut -d' ' -f 5- | sort | uniq -u | dmenu -i | xargs -IWIN sh -c 'wmctrl -F -a \"WIN\" && wmctrl -F -a \"WIN\"'"
 
 musicKeymap = [ ("n", mpc "next")
               , ("N", mpc "prev")
