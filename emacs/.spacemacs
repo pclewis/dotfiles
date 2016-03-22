@@ -195,7 +195,17 @@ layers configuration."
     (progn
       (require 'evil-terminal-cursor-changer)
       (setq powerline-default-separator 'utf-8)
-      (xterm-mouse-mode -1))))
+      (xterm-mouse-mode -1)
+      (define-key input-decode-map (kbd "M-O a") [C-up])
+      (define-key input-decode-map (kbd "M-O b") [C-down])
+      (define-key input-decode-map (kbd "M-O c") [C-right])
+      (define-key input-decode-map (kbd "M-O d") [C-left])
+      (define-key input-decode-map (kbd "ESC M-O A") [M-up])
+      (define-key input-decode-map (kbd "ESC M-O B") [M-down])
+      (define-key input-decode-map (kbd "ESC M-O C") [M-right])
+      (define-key input-decode-map (kbd "ESC M-O D") [M-left])
+
+      )))
 
 ;; Do not write anything past this comment. This is where Emacs will
 ;; auto-generate custom variable definitions.
