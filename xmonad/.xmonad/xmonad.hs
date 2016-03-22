@@ -12,7 +12,7 @@ import Data.Monoid
 import System.Exit
 import XMonad.Hooks.EwmhDesktops
 import XMonad.Hooks.SetWMName
---import XMonad.Hooks.ICCCMFocus
+import XMonad.Hooks.ICCCMFocus
 import XMonad.Actions.CopyWindow
 import XMonad.Layout.WindowNavigation
 import XMonad.Actions.WindowNavigation
@@ -110,12 +110,9 @@ focusKeymap = [ ("f", focus "Vimperator")
               , ("m", windows W.focusMaster)
               , ("/", spawn menu)
               ]
-  -- Firefox is sometimes reluctant to give up keyboard focus.
-  -- Calling wmctrl twice seems to make it cooperate.
-  where focus' :: String -> X ()
-        focus' w = spawn ("wmctrl -a " ++ w)
-        focus w = focus' w >> focus' w
-        menu = "wmctrl -l | cut -d' ' -f 5- | sort | uniq -u | dmenu -i | xargs -IWIN sh -c 'wmctrl -F -a \"WIN\" && wmctrl -F -a \"WIN\"'"
+  where focus :: String -> X ()
+        focus w = spawn ("wmctrl -a " ++ w)
+        menu = "wmctrl -l | cut -d' ' -f 5- | sort | uniq -u | dmenu -i | xargs -IWIN wmctrl -F -a WIN"
 
 musicKeymap = [ ("n", mpc "next")
               , ("N", mpc "prev")
@@ -278,6 +275,7 @@ myEventHook = handleTimerEvent
 --
 myLogHook = (fadeInactiveLogHook 0.80)
             >> updatePointer (0.5, 0.5) (0, 0)
+            >> takeTopFocus
  -- <+> takeTopFocus -- return ()
 
 ------------------------------------------------------------------------
