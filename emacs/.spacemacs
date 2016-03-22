@@ -173,6 +173,10 @@ layers configuration."
   (add-hook 'clojure-mode-hook #'smartparens-strict-mode)
   (add-hook 'clojure-mode-hook (lambda ()
                                  (define-clojure-indent
+                                   ;; plumbing
+                                   (fnk 'defun)
+                                   (defnk 'defun)
+                                   ;; midje
                                    (fact 'defun)
                                    (facts 'defun)
                                    (fact-group 'defun)
