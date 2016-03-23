@@ -195,6 +195,9 @@ layers configuration."
     (progn
       (require 'evil-terminal-cursor-changer)
       (setq powerline-default-separator 'utf-8)
+      (setq dotspacemacs-mode-line-unicode-symbols nil)
+      (setq spaceline-workspace-numbers-unicode nil)
+      (setq spaceline-window-numbers-unicode nil)
       (xterm-mouse-mode -1)
       (define-key input-decode-map (kbd "M-O a") [C-up])
       (define-key input-decode-map (kbd "M-O b") [C-down])
