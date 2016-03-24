@@ -36,7 +36,7 @@
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages then consider to create a layer, you can also put the
    ;; configuration in `dotspacemacs/config'.
-   dotspacemacs-additional-packages '(evil-terminal-cursor-changer)
+   dotspacemacs-additional-packages '() ;;'(evil-terminal-cursor-changer)
    ;; A list of packages and/or extensions that will not be install and loaded.
    dotspacemacs-excluded-packages '()
    ;; If non-nil spacemacs will delete any orphan packages, i.e. packages that
@@ -136,7 +136,7 @@ before layers configuration."
    ;; Transparency can be toggled through `toggle-transparency'.
    dotspacemacs-inactive-transparency 90
    ;; If non nil unicode symbols are displayed in the mode line.
-   dotspacemacs-mode-line-unicode-symbols t
+   dotspacemacs-mode-line-unicode-symbols 'display-graphic-p
    ;; If non nil smooth scrolling (native-scrolling) is enabled. Smooth
    ;; scrolling overrides the default behavior of Emacs which recenters the
    ;; point when it reaches the top or bottom of the screen.
@@ -159,17 +159,33 @@ before layers configuration."
   ;; User initialization goes here
   )
 
+(defun pcl/fix-terminal-keys ()
+  (define-key input-decode-map (kbd "M-O a") [C-up])
+  (define-key input-decode-map (kbd "M-O b") [C-down])
+  (define-key input-decode-map (kbd "M-O c") [C-right])
+  (define-key input-decode-map (kbd "M-O d") [C-left])
+  (define-key input-decode-map (kbd "ESC M-O A") [M-up])
+  (define-key input-decode-map (kbd "ESC M-O B") [M-down])
+  (define-key input-decode-map (kbd "ESC M-O C") [M-right])
+  (define-key input-decode-map (kbd "ESC M-O D") [M-left]))
+
+(defun pcl/fix-powerline ()
+  (setq powerline-default-separator (if (display-graphic-p) 'wave 'utf-8)))
+
 (defun dotspacemacs/user-config ()
   "Configuration function.
  This function is called at the very end of Spacemacs initialization after
 layers configuration."
-  (setq clojure-enable-fancify-symbols t)
+
+  ;; paredit keys I can't stop using
   (define-key evil-insert-state-map (kbd "<C-right>")   'sp-forward-slurp-sexp)
   (define-key evil-insert-state-map (kbd "<C-left>")    'sp-forward-barf-sexp)
   (define-key evil-insert-state-map (kbd "<C-S-right>") 'sp-forward-sexp)
   (define-key evil-insert-state-map (kbd "<C-S-left>")  'sp-backward-sexp)
   (define-key evil-insert-state-map (kbd "<M-up>")      'sp-raise-sexp)
+  (define-key evil-insert-state-map (kbd "C-k")         'sp-kill-sexp)
 
+  ;; Clojure stuff
   (add-hook 'clojure-mode-hook #'smartparens-strict-mode)
   (add-hook 'clojure-mode-hook (lambda ()
                                  (define-clojure-indent
@@ -185,30 +201,25 @@ layers configuration."
                                    (tabular 'defun)
                                    (against-background 'defun)
                                    (provided 0))))
-
-  (setenv "PATH" (concat (getenv "PATH") ":/run/current-system/sw/bin"))
-  (setq exec-path (append exec-path '("/run/current-system/sw/bin")))
+  (setq clojure-enable-fancify-symbols t)
+  (setq clojure-align-forms-automatically t)
 
   (setq cider-cljs-lein-repl "(do (use 'figwheel-sidecar.repl-api) (start-figwheel!) (cljs-repl))")
 
-  (unless (display-graphic-p)
-    (progn
-      (require 'evil-terminal-cursor-changer)
-      (setq powerline-default-separator 'utf-8)
-      (setq dotspacemacs-mode-line-unicode-symbols nil)
-      (setq spaceline-workspace-numbers-unicode nil)
-      (setq spaceline-window-numbers-unicode nil)
-      (xterm-mouse-mode -1)
-      (define-key input-decode-map (kbd "M-O a") [C-up])
-      (define-key input-decode-map (kbd "M-O b") [C-down])
-      (define-key input-decode-map (kbd "M-O c") [C-right])
-      (define-key input-decode-map (kbd "M-O d") [C-left])
-      (define-key input-decode-map (kbd "ESC M-O A") [M-up])
-      (define-key input-decode-map (kbd "ESC M-O B") [M-down])
-      (define-key input-decode-map (kbd "ESC M-O C") [M-right])
-      (define-key input-decode-map (kbd "ESC M-O D") [M-left])
+  ;; fix PATH when run as service on nixos
+  (setenv "PATH" (concat (getenv "PATH") ":/run/current-system/sw/bin"))
+  (setq exec-path (append exec-path '("/run/current-system/sw/bin")))
 
-      )))
+  ;; terminal stuff
+  (xterm-mouse-mode -1)
+  (add-hook 'spaceline-pre-hook #'pcl/fix-powerline)
+  (add-hook 'terminal-init-xterm-hook #'pcl/fix-terminal-keys)
+
+  ;; Hack to disable GUI theme reload: unsafely assume last hook is the one that reloads theme
+  ;(setq spacemacs--after-display-system-init-list (butlast spacemacs--after-display-system-init-list))
+  ;; reload theme when terminal client connects so colors aren't terrible
+  (add-hook 'terminal-init-xterm-hook (lambda () (load-theme spacemacs--cur-theme t)))
+)
 
 ;; Do not write anything past this comment. This is where Emacs will
 ;; auto-generate custom variable definitions.
