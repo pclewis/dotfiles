@@ -19,3 +19,6 @@ export EDITOR=vim
 # <@bigeasy> Shared history turns your shell history into a useless Twitter feed of what your alter egos are doing.
 # TODO: murder whoever is setting this in the first place
 setopt NO_SHARE_HISTORY
+
+# fix ls
+export QUOTING_STYLE=literal
