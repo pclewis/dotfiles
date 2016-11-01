@@ -139,6 +139,17 @@ screenKeymap = [ ("0", rescreen)
                , ("5", layoutSplitScreen 5 $ ThreeColMid 1 (3/100) (1/2))
                ]
 
+shotKeymap = [ ("c", setContext)
+             , ("s", takeShot select)
+             , ("w", takeShot currentWindow)
+             , ("o", openDirectory)
+             ]
+  where setContext = spawn ("~/.xmonad/sshot-context.sh")
+        takeShot a = spawn ("scrot " ++ a ++ " ~/screenshots/current-context/'%Y-%m-%dT%H%M%S_$wx$h.png'")
+        openDirectory = spawn ("xdg-open ~/screenshots/current-context/")
+        select        = "-s"
+        currentWindow = "-u"
+
 mainKeymap c = mkKeymap c $
     [ ("M-S-<Return>", spawn myTerminal)
     , ("M-p",          spawn "dmenu_run")
@@ -156,6 +167,7 @@ mainKeymap c = mkKeymap c $
     , ("M-m",          toSubmap c "musicKeymap" musicKeymap)
     , ("M-a",          toSubmap c "masterKeymap" masterKeymap)
     , ("M-=",          toSubmap c "screenKeymap" screenKeymap)
+    , ("M-s",          toSubmap c "shotKeymap" shotKeymap)
     , ("M-S-/",        toSubmap c "mainKeymap" [])
     ]
   where nextWindow      = windows W.focusDown
