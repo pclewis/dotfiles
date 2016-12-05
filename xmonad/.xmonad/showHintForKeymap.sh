@@ -21,7 +21,7 @@ INFO=$(awk -v cmdcolor=$CMDCOLOR -v keycolor=$KEYCOLOR \
                 # skip any empty records.
                 if (length(cmd[1]) > 0){
                     # if there is a comment use that for the description.
-                    if (length(f[2]) > 0) {
+                    if (length(fields[2]) > 0) {
                             desc=fields[2]
                         } else {
                             desc=cmd[2]
@@ -29,9 +29,9 @@ INFO=$(awk -v cmdcolor=$CMDCOLOR -v keycolor=$KEYCOLOR \
                     printf ("    ^fg(%s)%6s ^fg(%s)%s\n", keycolor, cmd[1], cmdcolor, desc)
                 }
             }' \
-                ~/.xmonad/xmonad.hs \
-                   | column -c $COLS \
-                   | expand)
+           ~/.xmonad/xmonad.hs \
+              | column -c $COLS \
+              | expand)
 
 echo "$INFO"
 N_LINES=$(wc -l <<< "$INFO")
