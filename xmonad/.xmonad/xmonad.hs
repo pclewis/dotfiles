@@ -92,6 +92,8 @@ focusedScreenSize = withWindowSet $ windowScreenSize . fromJust . W.peek
 
 keyColor = "purple"
 cmdColor = "white"
+-- double quoted so it can make it all the way to dzen.
+dzenFont = "\"-*-ubuntu mono-*-*-*-*-*-*-*-*-*-*-*-*\""
 
 keyMapDoc :: String -> X Handle
 keyMapDoc name = do
@@ -103,7 +105,8 @@ keyMapDoc name = do
                                  show (rect_width ss),
                                  show (rect_height ss)
                                  keyColor,
-                                 cmdColor]
+                                 cmdColor,
+                                 dzenFont]
   return handle
 
 toSubmap :: XConfig l -> String -> [(String, X ())] -> X ()
