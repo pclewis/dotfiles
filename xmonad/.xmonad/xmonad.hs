@@ -90,10 +90,23 @@ focusedScreenSize = withWindowSet $ windowScreenSize . fromJust . W.peek
   -- ss <- windowScreenSize $ fromJust $ W.peek ws
   -- return ss
 
+keyColor = "purple"
+cmdColor = "white"
+-- double quoted so it can make it all the way to dzen.
+dzenFont = "\"-*-ubuntu mono-*-*-*-*-*-*-*-*-*-*-*-*\""
+
 keyMapDoc :: String -> X Handle
 keyMapDoc name = do
   ss <- focusedScreenSize
-  handle <- spawnPipe $ unwords ["~/.xmonad/showHintForKeymap.sh", name, show (rect_x ss), show (rect_y ss), show (rect_width ss), show (rect_height ss)]
+  handle <- spawnPipe $ unwords ["~/.xmonad/showHintForKeymap.sh",
+                                 name,
+                                 show (rect_x ss),
+                                 show (rect_y ss),
+                                 show (rect_width ss),
+                                 show (rect_height ss)
+                                 keyColor,
+                                 cmdColor,
+                                 dzenFont]
   return handle
 
 toSubmap :: XConfig l -> String -> [(String, X ())] -> X ()
