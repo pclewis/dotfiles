@@ -73,21 +73,6 @@ myWorkspaces    = ["1","2","3","4","5","6","7","8","9"]
 myNormalBorderColor  = "#000000"
 myFocusedBorderColor = "#0000ff"
 
-windowScreenSize :: Window -> X (Rectangle)
-windowScreenSize w = withDisplay $ \d -> do
-    ws <- gets windowset
-    sc <- fromMaybe (W.current ws) <$> pointScreen 10 10 -- who cares where.
-
-    return $ screenRect . W.screenDetail $ sc
-  where fi x = fromIntegral x
-
-focusedScreenSize :: X (Rectangle)
-focusedScreenSize = withWindowSet $ windowScreenSize . fromJust . W.peek
-
-  -- withWindowSet $ \ws -> do
-  -- ss <- windowScreenSize $ fromJust $ W.peek ws
-  -- return ss
-
 keyColor = "purple"
 cmdColor = "white"
 -- double quoted so it can make it all the way to dzen.
@@ -96,13 +81,15 @@ lineHeight = "18"
 
 keyMapDoc :: String -> X Handle
 keyMapDoc name = do
-  ss <- focusedScreenSize
+  -- focused screen location/size
+  r <- withWindowSet $ return . screenRect . W.screenDetail . W.current
+
   handle <- spawnPipe $ unwords ["~/.xmonad/showHintForKeymap.sh",
                                  name,
-                                 show (rect_x ss),
-                                 show (rect_y ss),
-                                 show (rect_width ss),
-                                 show (rect_height ss),
+                                 show (rect_x r),
+                                 show (rect_y r),
+                                 show (rect_width r),
+                                 show (rect_height r),
                                  keyColor,
                                  cmdColor,
                                  dzenFont,
