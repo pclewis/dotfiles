@@ -13,16 +13,23 @@ import System.Exit
 import XMonad.Hooks.EwmhDesktops
 import XMonad.Hooks.SetWMName
 import XMonad.Hooks.ICCCMFocus
+import XMonad.Hooks.InsertPosition
 import XMonad.Actions.CopyWindow
 import XMonad.Layout.WindowNavigation
 import XMonad.Actions.WindowNavigation
+import XMonad.Layout.Combo
+import XMonad.Layout.Spacing
+import XMonad.Layout.Gaps
 import XMonad.Hooks.FadeInactive
+import XMonad.Hooks.FadeWindows
 import XMonad.Layout.NoBorders
 import XMonad.Actions.FloatKeys
 import XMonad.Util.Replace
 import XMonad.Layout.LayoutScreens
 import XMonad.Layout.Grid
 import XMonad.Layout.TwoPane
+import XMonad.Layout.Master
+import XMonad.Layout.Dishes
 import XMonad.Layout.ThreeColumns
 import XMonad.Layout.Column
 import XMonad.Actions.UpdatePointer
@@ -30,6 +37,7 @@ import XMonad.Actions.Submap
 import XMonad.Actions.ShowText
 import XMonad.Util.Run
 import XMonad.Util.EZConfig
+import XMonad.Layout.LayoutCombinators hiding ( (|||) )
 import System.IO (hClose, hFlush, Handle)
 import Data.Maybe (fromMaybe, fromJust)
 
@@ -48,7 +56,7 @@ myFocusFollowsMouse = True
 
 -- Width of the window border in pixels.
 --
-myBorderWidth   = 1
+myBorderWidth   = 4
 
 -- modMask lets you specify which modkey you want to use. The default
 -- is mod1Mask ("left alt").  You may also consider using mod3Mask
@@ -70,8 +78,8 @@ myWorkspaces    = ["1","2","3","4","5","6","7","8","9"]
 
 -- Border colors for unfocused and focused windows, respectively.
 --
-myNormalBorderColor  = "#000000"
-myFocusedBorderColor = "#0000ff"
+myNormalBorderColor  = "#5d4d7a"
+myFocusedBorderColor = "#bc6ec5"
 
 keyMapDoc :: String -> X Handle
 keyMapDoc name = do
@@ -229,7 +237,8 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
 -- The available layouts.  Note that each layout is separated by |||,
 -- which denotes layout choice.
 --
-myLayout = noBorders $ column ||| tiled ||| Mirror tiled ||| Full
+gap = 8
+myLayout = gaps [(U,gap),(D,gap),(L,gap),(R,gap)] $ spacing gap $ smartBorders $ column ||| tiled ||| Mirror tiled ||| Full ||| Dishes 1 (1/6) ||| (mastered (1/100) (2/5) (Dishes 1 (1/6)))
   where
      column = Column 1
      -- default tiling algorithm partitions the screen into two panes
@@ -259,7 +268,9 @@ myLayout = noBorders $ column ||| tiled ||| Mirror tiled ||| Full
 -- To match on the WM_NAME, you can use 'title' in the same way that
 -- 'className' and 'resource' are used below.
 --
-myManageHook = composeAll
+myManageHook =
+  insertPosition End Newer
+  <+> composeAll
     [ className =? "MPlayer"        --> doFloat
     , className =? "Gimp"           --> doFloat
     , className =? "Screenkey"      --> doFloat
@@ -286,10 +297,8 @@ myEventHook = handleTimerEvent
 -- Perform an arbitrary action on each internal state change or X event.
 -- See the 'XMonad.Hooks.DynamicLog' extension for examples.
 --
-myLogHook = (fadeInactiveLogHook 0.80)
-            >> updatePointer (0.5, 0.5) (0, 0)
+myLogHook = updatePointer (0.5, 0.5) (0, 0)
             >> takeTopFocus
- -- <+> takeTopFocus -- return ()
 
 ------------------------------------------------------------------------
 -- Startup hook
