@@ -71,8 +71,7 @@ INFO=$(awk -v cmdcolor=$CMDCOLOR -v keycolor=$KEYCOLOR -v cols=$COLS \
 echo "$INFO"
 
 N_LINES=$(wc -l <<< "$INFO")
-Y=$(($3 + $5 - ($LH * ($N_LINES+3))))
+Y=$(($3 + $5 - ($LH * ($N_LINES+1))))
 sleep 1
 # $KEYMAP ($2 , $3 , $4 , $5, $LH, $X, $Y, $W, $N_LINES, $COLS
-(echo "$INFO"
- cat) | dzen2 -l $(($N_LINES+2)) -fn "${FONT}" -h $LH -x $X -y $Y -w $W -e onstart=uncollapse
+(echo "$INFO"; cat) | dzen2 -l $(($N_LINES)) -fn "${FONT}" -h $LH -x $X -y $Y -w $W -e onstart=uncollapse

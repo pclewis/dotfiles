@@ -73,27 +73,22 @@ myWorkspaces    = ["1","2","3","4","5","6","7","8","9"]
 myNormalBorderColor  = "#000000"
 myFocusedBorderColor = "#0000ff"
 
-keyColor = "purple"
-cmdColor = "white"
--- double quoted so it can make it all the way to dzen.
-dzenFont = "\"-*-ubuntu mono-*-*-*-*-*-*-*-*-*-*-*-*\""
-lineHeight = "18"
-
 keyMapDoc :: String -> X Handle
 keyMapDoc name = do
   -- focused screen location/size
   r <- withWindowSet $ return . screenRect . W.screenDetail . W.current
 
-  handle <- spawnPipe $ unwords ["~/.xmonad/showHintForKeymap.sh",
-                                 name,
-                                 show (rect_x r),
-                                 show (rect_y r),
-                                 show (rect_width r),
-                                 show (rect_height r),
-                                 keyColor,
-                                 cmdColor,
-                                 dzenFont,
-                                 lineHeight]
+  handle <- spawnPipe $ unwords [ "~/.xmonad/showHintForKeymap.sh"
+                                , name
+                                , show (rect_x r)
+                                , show (rect_y r)
+                                , show (rect_width r)
+                                , show (rect_height r)
+                                , "purple"       -- key color
+                                , "white"        -- cmd color
+                                , "Input\\ Mono" -- font
+                                , "18"           -- line height
+                                ]
 
   return handle
 
