@@ -76,9 +76,7 @@ myFocusedBorderColor = "#0000ff"
 windowScreenSize :: Window -> X (Rectangle)
 windowScreenSize w = withDisplay $ \d -> do
     ws <- gets windowset
-    wa <- io $ getWindowAttributes d w
-    bw <- fi <$> asks (borderWidth . config)
-    sc <- fromMaybe (W.current ws) <$> pointScreen (fi $ wa_x wa) (fi $ wa_y wa)
+    sc <- fromMaybe (W.current ws) <$> pointScreen 10 10 -- who cares where.
 
     return $ screenRect . W.screenDetail $ sc
   where fi x = fromIntegral x
@@ -94,6 +92,7 @@ keyColor = "purple"
 cmdColor = "white"
 -- double quoted so it can make it all the way to dzen.
 dzenFont = "\"-*-ubuntu mono-*-*-*-*-*-*-*-*-*-*-*-*\""
+lineHeight = "18"
 
 keyMapDoc :: String -> X Handle
 keyMapDoc name = do
@@ -103,10 +102,12 @@ keyMapDoc name = do
                                  show (rect_x ss),
                                  show (rect_y ss),
                                  show (rect_width ss),
-                                 show (rect_height ss)
+                                 show (rect_height ss),
                                  keyColor,
                                  cmdColor,
-                                 dzenFont]
+                                 dzenFont,
+                                 lineHeight]
+
   return handle
 
 toSubmap :: XConfig l -> String -> [(String, X ())] -> X ()
@@ -116,47 +117,52 @@ toSubmap c name m = do
   io $ hClose pipe
 
 -- Note: Formatting is important for script
-focusKeymap = [ ("f", focus "Vimperator")
-              , ("e", focus "emacs")
-              , ("w", focus "Weechat")
-              , ("c", focus "Chromium")
-              , ("m", windows W.focusMaster)
-              , ("/", spawn menu)
-              ]
+focusKeymap = -- Focus
+  [ ("f", focus "Vimperator") -- vimperator
+  , ("e", focus "emacs") -- Emacs
+  , ("w", focus "Weechat") -- Weechat
+  , ("c", focus "Chromium") -- Chromium
+  , ("m", windows W.focusMaster) -- Focus Master
+  , ("/", spawn menu)
+  ]
   where focus :: String -> X ()
         focus w = spawn ("wmctrl -a " ++ w)
         menu = "wmctrl -l | cut -d' ' -f 5- | sort | uniq -u | dmenu -i | xargs -IWIN wmctrl -F -a WIN"
 
-musicKeymap = [ ("n", mpc "next")
-              , ("N", mpc "prev")
-              , ("p", mpc "toggle")
-              , ("r", mpc "random")
-              , ("l", mpc "repeat")
-              ]
+musicKeymap = -- Music
+  [ ("n", mpc "next") -- Next
+  , ("N", mpc "prev") -- Prev
+  , ("p", mpc "toggle") -- Toggle
+  , ("r", mpc "random") -- Random
+  , ("l", mpc "repeat") -- Repeat
+  ]
   where mpc c = spawn ("mpc " ++ c)
 
-masterKeymap = [ ("f",   windows W.focusMaster)
-               , ("s",   windows W.swapMaster)
-               , ("h",   sendMessage Shrink)
-               , ("l",   sendMessage Expand)
-               , ("k",   incMaster)
-               , ("j",   decMaster)
-               ]
+masterKeymap = -- Master Window
+  [ ("f",   windows W.focusMaster) -- Focus
+  , ("s",   windows W.swapMaster) -- Swap
+  , ("h",   sendMessage Shrink) -- Shrink
+  , ("l",   sendMessage Expand) -- Expand
+  , ("k",   incMaster) -- Inc
+  , ("j",   decMaster) -- Dec
+  ]
   where incMaster       = sendMessage (IncMasterN 1)
         decMaster       = sendMessage (IncMasterN (-1))
 
-screenKeymap = [ ("0", rescreen)
-               , ("2", layoutSplitScreen 2 $ TwoPane (3/100) (1/2))
-               , ("3", layoutSplitScreen 3 $ ThreeColMid 1 (3/100) (1/2))
-               , ("4", layoutSplitScreen 4 Grid)
-               , ("5", layoutSplitScreen 5 $ ThreeColMid 1 (3/100) (1/2))
-               ]
+screenKeymap = -- Screen
+  [ ("0", rescreen)
+  , ("2", layoutSplitScreen 2 $ TwoPane (3/100) (1/2)) -- TwoPane
+  , ("3", layoutSplitScreen 3 $ ThreeColMid 1 (3/100) (1/2)) -- ThreeColmid
+  , ("4", layoutSplitScreen 4 Grid) -- Grid
+  , ("5", layoutSplitScreen 5 $ ThreeColMid 1 (3/100) (1/2)) -- ThreeColmid
+  ]
 
-shotKeymap = [ ("c", setContext)
-             , ("s", takeShot select)
-             , ("w", takeShot currentWindow)
-             , ("o", openDirectory)
-             ]
+shotKeymap = -- Screen Shot
+  [ ("c", setContext) -- Context
+  , ("s", takeShot select) -- Select
+  , ("w", takeShot currentWindow) -- Current Window
+  , ("o", openDirectory)
+  ]
   where setContext = spawn ("~/.xmonad/sshot-context.sh")
         takeShot a = spawn ("scrot " ++ a ++ " ~/screenshots/current-context/'%Y-%m-%dT%H%M%S_$wx$h.png'")
         openDirectory = spawn ("xdg-open ~/screenshots/current-context/")
@@ -164,24 +170,24 @@ shotKeymap = [ ("c", setContext)
         currentWindow = "-u"
 
 mainKeymap c = mkKeymap c $
-    [ ("M-S-<Return>", spawn myTerminal)
-    , ("M-p",          spawn "dmenu_run")
+    [ ("M-S-<Return>", spawn myTerminal) -- Terminal
+    , ("M-p",          spawn "dmenu_run") -- Dmenu
     , ("M-S-c",        kill)
-    , ("M-<Space>",    sendMessage NextLayout)
-    , ("M-<Tab>",      nextWindow)
-    , ("M-S-<Tab>",    prevWindow)
-    , ("M-M1-h",       sendMessage Shrink)
-    , ("M-M1-l",       sendMessage Expand)
-    , ("M-t",          withFocused $ windows . W.sink)
-    , ("M-q",          spawn "xmonad --recompile; xmonad --restart")
-    , ("M-S-q",        io $ exitWith ExitSuccess)
-    , ("C-M1-l",       spawn "xscreensaver-command -lock")
-    , ("M-w",          toSubmap c "focusKeymap" focusKeymap)
-    , ("M-m",          toSubmap c "musicKeymap" musicKeymap)
-    , ("M-a",          toSubmap c "masterKeymap" masterKeymap)
-    , ("M-=",          toSubmap c "screenKeymap" screenKeymap)
-    , ("M-s",          toSubmap c "shotKeymap" shotKeymap)
-    , ("M-S-/",        toSubmap c "mainKeymap" [])
+    , ("M-<Space>",    sendMessage NextLayout) -- Next Layout
+    , ("M-<Tab>",      nextWindow) -- Next Window
+    , ("M-S-<Tab>",    prevWindow) -- Prev Window
+    , ("M-M1-h",       sendMessage Shrink) -- Shrink
+    , ("M-M1-l",       sendMessage Expand) -- Expand
+    , ("M-t",          withFocused $ windows . W.sink) -- Sink
+    , ("M-q",          spawn "xmonad --recompile; xmonad --restart") -- Restart
+    , ("M-S-q",        io $ exitWith ExitSuccess) -- Exit
+    , ("C-M1-l",       spawn "xscreensaver-command -lock") -- Screen Lock
+    , ("M-w",          toSubmap c "focusKeymap" focusKeymap) -- Focus
+    , ("M-m",          toSubmap c "musicKeymap" musicKeymap) -- Music
+    , ("M-a",          toSubmap c "masterKeymap" masterKeymap) -- Master
+    , ("M-=",          toSubmap c "screenKeymap" screenKeymap) -- Screen
+    , ("M-s",          toSubmap c "shotKeymap" shotKeymap) -- Screen Shot
+    , ("M-S-/",        toSubmap c "mainKeymap" []) -- Main Menu
     ]
   where nextWindow      = windows W.focusDown
         prevWindow      = windows W.focusUp
@@ -331,7 +337,7 @@ main = do
 --
 -- No need to modify this.
 --
-defaults = defaultConfig {
+defaults = def {
       -- simple stuff
         terminal           = myTerminal,
         focusFollowsMouse  = myFocusFollowsMouse,
