@@ -1,7 +1,7 @@
 URxvt.scrollstyle:       plain
 URxvt.secondaryScroll:   true
 URxvt.scrollBar_right:   true
-URxvt.fading:            35
+!! URxvt.fading:            35
 URxvt.saveLines:         65535
 URxvt.iconName:          terminal
 URxvt.termName:          xterm-256color
@@ -9,7 +9,7 @@ URxvt.font:              xft:Input Mono:size=12,xft:Unifont:size=9
 URxvt*skipBuiltinGlyphs: true
 
 !! convert -size '1x4000!' 'xc:#1f2022' -fill 'rgba(255,255,255,0.2)' -draw 'point 0,0' bg.png 
-URxvt.backgroundPixmap:  /home/pcl/dotfiles/xdefaults/bg.png;style=tiled
+!! URxvt.backgroundPixmap:  /home/pcl/dotfiles/xdefaults/bg.png;style=tiled
 
 !! Spacemacs colors, https://github.com/chriskempson/base16-builder/pull/345
 
