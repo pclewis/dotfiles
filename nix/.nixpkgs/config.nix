@@ -20,6 +20,14 @@
           sed -i "s,plugin.h,plugin.h ${newPackages.qt5.qtwebkit.dev}/include/QtWebKit/qwebkitplatformplugin.h," src/src.pro  
         '';
       });
+
+      ##
+      # qtwebengine
+      ##
+      pyqt5 = originalPackages.python3Packages.pyqt5.overrideAttrs(oldAttrs: {
+        buildInputs = oldAttrs.buildInputs ++ [ originalPackages.qt5.qtwebengine ];
+      });
+
     }).overrideAttrs(oldAttrs: rec {
       ##
       # 0.9.0 -> 0.9.1
