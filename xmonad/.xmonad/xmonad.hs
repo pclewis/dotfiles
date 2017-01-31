@@ -14,6 +14,7 @@ import XMonad.Hooks.EwmhDesktops
 import XMonad.Hooks.SetWMName
 import XMonad.Hooks.ICCCMFocus
 import XMonad.Hooks.InsertPosition
+import XMonad.Hooks.ManageHelpers
 import XMonad.Actions.CopyWindow
 import XMonad.Layout.WindowNavigation
 import XMonad.Actions.WindowNavigation
@@ -268,16 +269,21 @@ myLayout = gaps [(U,gap),(D,gap),(L,gap),(R,gap)] $ spacing gap $ smartBorders $
 -- To match on the WM_NAME, you can use 'title' in the same way that
 -- 'className' and 'resource' are used below.
 --
-myManageHook =
-  insertPosition End Newer
-  <+> composeAll
-    [ className =? "MPlayer"        --> doFloat
-    , className =? "Gimp"           --> doFloat
-    , className =? "Screenkey"      --> doFloat
-    , resource  =? "desktop_window" --> doIgnore
-    , resource  =? "kdesktop"       --> doIgnore
-    , className =? "Xfce4-notifyd"  --> doIgnore
-    ]
+myManageHook = composeOne
+  [ className =? "MPlayer"        -?> doFloat
+  , className =? "Gimp"           -?> doFloat
+  , className =? "Screenkey"      -?> doFloat
+  , resource  =? "desktop_window" -?> doIgnore
+  , resource  =? "kdesktop"       -?> doIgnore
+  , className =? "Xfce4-notifyd"  -?> doIgnore
+  , className =? "pinentry-gtk-2" -?> doFloat
+  , role      =? "pop-up"         -?> doCenterFloat
+  , isDialog                      -?> doCenterFloat
+  , transience -- I don't actually understand what this does
+  , isFullscreen                  -?> doFullFloat
+  , pure True                     -?> insertPosition End Newer
+  ]
+  where role = stringProperty "WM_WINDOW_ROLE"
 
 ------------------------------------------------------------------------
 -- Event handling
