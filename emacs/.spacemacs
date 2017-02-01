@@ -175,20 +175,62 @@ before layers configuration."
 (defun pcl/fix-powerline ()
   (setq powerline-default-separator (if (display-graphic-p) 'wave 'utf-8)))
 
+(defun pcl/eval-line-sexp ()
+   (interactive)
+   (setq evil-move-beyond-eol t)
+   (save-excursion (execute-kbd-macro (kbd "$,ee")))
+   (setq evil-move-beyond-eol nil))
+
+(defun pcl/eval-defun-not-comment ()
+  (interactive)
+  (save-excursion
+    (let (last-pos (point))
+      (condition-case nil
+          (while (not (string-equal "(comment"
+                                    (buffer-substring-no-properties (point) (+ (point) 8))))
+            (print          (buffer-substring-no-properties (point) (+ (point) 8)))
+            (setq last-pos (point))
+            (backward-up-list))
+        (scan-error nil))
+      (goto-char last-pos)
+      (execute-kbd-macro (kbd "va(,er"))
+      (evil-exit-visual-state))))
+
+(defun pcl/indent-sexp ()
+  (interactive)
+  (save-excursion
+    (execute-kbd-macro (kbd "va(=va("))
+    (call-interactively 'clojure-align)
+    (evil-exit-visual-state)))
+
+(defun pcl/indent-defun ()
+  (interactive)
+  (sp-indent-defun)
+  (call-interactively 'clojure-align))
+
 (defun dotspacemacs/user-config ()
   "Configuration function.
  This function is called at the very end of Spacemacs initialization after
 layers configuration."
 
-  ;; paredit keys I can't stop using
+  ;; useful insert mode keys
+  (define-key evil-insert-state-map (kbd "<C-up>")      'sp-raise-sexp)
   (define-key evil-insert-state-map (kbd "<C-right>")   'sp-forward-slurp-sexp)
   (define-key evil-insert-state-map (kbd "<C-left>")    'sp-forward-barf-sexp)
-  (define-key evil-insert-state-map (kbd "<C-S-right>") 'sp-forward-sexp)
-  (define-key evil-insert-state-map (kbd "<C-S-left>")  'sp-backward-sexp)
-  (define-key evil-insert-state-map (kbd "<M-up>")      'sp-raise-sexp)
   (define-key evil-insert-state-map (kbd "C-k")         'sp-kill-sexp)
 
   ;; Clojure stuff
+  (spacemacs/set-leader-keys-for-major-mode 'clojure-mode
+    "eE" 'pcl/eval-line-sexp
+    "eF" 'pcl/eval-defun-not-comment
+    "ix" 'pcl/indent-sexp
+    "if" 'pcl/indent-defun
+    "cm" 'clojure-convert-collection-to-map
+    "cs" 'clojure-convert-collection-to-set
+    "cl" 'clojure-convert-collection-to-list
+    "c'" 'clojure-convert-collection-to-quoted-list
+    "cv" 'clojure-convert-collection-to-vector)
+
   (add-hook 'clojure-mode-hook #'smartparens-strict-mode)
   (add-hook 'clojure-mode-hook (lambda ()
                                  (define-clojure-indent
