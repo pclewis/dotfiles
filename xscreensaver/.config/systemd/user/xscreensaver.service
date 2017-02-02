@@ -1,0 +1,10 @@
+[Unit]
+Description=XScreensaver
+
+[Service]
+ExecStart=/home/pcl/.nix-profile/bin/xscreensaver -no-splash
+ExecStartPre=/home/pcl/.nix-profile/bin/xscreensaver-command -exit
+ExecStop=/home/pcl/.nix-profile/bin/xscreensaver-command -exit
+
+[Install]
+WantedBy=default.target
