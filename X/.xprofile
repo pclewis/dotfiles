@@ -1,0 +1,35 @@
+#!/bin/sh
+
+## Mouse acceleration
+#
+#   xset m <accel> <threshold>
+# 
+#   By default the pointer (the on-screen representation of the pointing
+#   device) will go `acceleration' times as fast when the device travels more
+#   than `threshold' mickeys (i.e. would-be pixels) in 10 ms, including a small
+#   transition range.
+#
+#   If  the  `threshold'  parameter  is provided and 0, the `acceleration'
+#   parameter will be used in the exponent of a more natural and continuous
+#   formula, giving precise control for slow motion but big reach for fast
+#   motion, and a progressive transition for motions in between.  Recommended
+#   `acceleration' value in this case is 3/2 to 3, but not limited to that
+#   range.
+#
+xset m 2/1 0
+
+## Make fonts reasonable size.
+xrandr --dpi 96
+
+## Set default background color.
+hsetroot -solid '#666666'
+
+## Use GPG as SSH Agent.
+export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
+
+## Start systemd user services.
+systemctl --user import-environment DISPLAY
+systemctl --user start X.target
+
+# note: dunst is started on demand from dbus via
+# ~/.nix-profile/share/dbus-1/services/org.knopwob.dunst.service
