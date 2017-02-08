@@ -52,7 +52,15 @@
     #
     pclenv = with newPackages; buildEnv {
       name = "pclenv";
-      paths = [
+
+      # Sometimes docs are under -man, -doc, or -info dirs in /nix/store, which
+      # seems to translate to attrs on the package. I don't know why or if there
+      # is a better way to do this. Installing the package with `nix-env -i` or
+      # even `nix-shell -p` usually includes the docs.
+      paths = let
+        catMeMaybe = x: attr: if builtins.hasAttr attr x then [(builtins.getAttr attr x)] else [];
+        sections = ["man" "doc" "info"];
+      in lib.concatMap (x: [x] ++ (lib.concatMap (catMeMaybe x) sections)) [
         ack
         acpi
         ag
