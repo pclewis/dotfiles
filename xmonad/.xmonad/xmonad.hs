@@ -305,6 +305,8 @@ myEventHook = handleTimerEvent
 --
 myLogHook = updatePointer (0.5, 0.5) (0, 0)
             >> takeTopFocus
+            -- TODO: figure out a better way to do this.
+            >> spawn "xdotool search dunst windowraise >/dev/null 2>&1"
 
 ------------------------------------------------------------------------
 -- Startup hook
