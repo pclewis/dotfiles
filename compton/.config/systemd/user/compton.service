@@ -1,0 +1,9 @@
+[Unit]
+Description=Compton X Compositor
+
+[Service]
+SyslogIdentifier=compton
+ExecStart=/bin/sh -c 'exec $HOME/.nix-profile/bin/compton'
+
+[Install]
+WantedBy=X.target
