@@ -53,38 +53,58 @@
     pclenv = with newPackages; buildEnv {
       name = "pclenv";
       paths = [
+        ack
         acpi
+        ag
+        chromium
+        compton
         davmail
+        dmenu2
         docker
         dos2unix
         dtrx
         dunst
         dzen2
         emacs
+        #firefox-bin
+        git
         gnupg
+        hsetroot
         htop
         imagemagick
+        jdk
         jq
         lastpass-cli
         leiningen
         libnotify
         lsof
+        mercurial
         mpv
         mu
         ncmpcpp
         nmap
         offlineimap
         p7zip
+        pinentry
         pwgen
+        python3
         qutebrowser
         rdesktop
+        ruby
+        rxvt_unicode
         scrot
+        stow
         tcpdump
         traceroute
         unclutter
+        unzip
+        x11_ssh_askpass
         xclip
+        xcompmgr
+        xlibs.xdpyinfo
+        xscreensaver
+        zip
       ];
     };
-
   };
 }
