@@ -1,6 +1,6 @@
 [submodule "emacs/.emacs.d"]
 	path = emacs/.emacs.d
 	url = https://github.com/syl20bnr/spacemacs
-[submodule "zsh/.zsh/antigen"]
-	path = zsh/.zsh/antigen
-	url = https://github.com/zsh-users/antigen.git
+[submodule "zsh/.zsh/zsh-syntax-highlighting"]
+	path = zsh/.zsh/zsh-syntax-highlighting
+	url = https://github.com/zsh-users/zsh-syntax-highlighting.git

@@ -1,23 +1,18 @@
-#ANTIGEN
-source $HOME/.zsh/antigen/antigen.zsh
+# syntax highlighting
+source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
-antigen bundles <<EOF
-  git
-  lein
-  zsh-users/zsh-syntax-highlighting
-EOF
+# prompt
+source ~/.zsh/prompt.zsh
 
-POWERLEVEL9K_PROMPT_ON_NEWLINE=true
+setopt PROMPT_SUBST
 
-antigen theme bhilburn/powerlevel9k powerlevel9k
-
-antigen apply
+RPROMPT=""
+PROMPT=$'$(_colorize $USER)%F{8}@%f$(_colorize $HOST)%F{8}:%f$(_prompt_pwd)%F{8}%#%f '
 
 # misc
 export EDITOR=vim
 
 # <@bigeasy> Shared history turns your shell history into a useless Twitter feed of what your alter egos are doing.
-# TODO: murder whoever is setting this in the first place
 setopt NO_SHARE_HISTORY
 
 # fix ls
