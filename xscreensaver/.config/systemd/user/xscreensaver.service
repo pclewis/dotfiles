@@ -8,4 +8,4 @@ ExecStartPre=/bin/sh -c 'exec $HOME/.nix-profile/bin/xscreensaver-command -exit'
 ExecStop=/bin/sh -c 'exec $HOME/.nix-profile/bin/xscreensaver-command -exit'
 
 [Install]
-WantedBy=default.target
+WantedBy=X.target
