@@ -28,6 +28,7 @@ import subprocess
 import sys
 import csv
 import os
+import io
 
 def HOME(path): return os.path.join( os.environ["HOME"], path )
 
@@ -38,8 +39,10 @@ dmcrypt_mapping_name = "passwords"
 dmcrypt_device       = os.path.join( "/dev/mapper", dmcrypt_mapping_name )
 
 def run(*args, **kwargs):
+    if "universal_newlines" not in kwargs:
+        # Use strings not bytes
+        kwargs['universal_newlines'] = True
     return subprocess.run( [str(a) for a in args]
-                         , universal_newlines=True # Use strings not bytes
                          , stdout=subprocess.PIPE  # Capture stdout
                          , check=True              # Throw exception on non-zero return
                          , **kwargs ).stdout.strip()
@@ -47,8 +50,8 @@ def run(*args, **kwargs):
 def sudo(*args, **kwargs):
     # Use -A and SUDO_ASKPASS to make sudo use a GUI dialog for password entry.
     sudo_env = os.environ.copy()
-    sudo_env["SUDO_ASKPASS"] = "askpass-pinentry.sh"
-    args = ["sudo", "-A"] + args
+    sudo_env["SUDO_ASKPASS"] = HOME("bin/askpass-pinentry.sh")
+    args = ["sudo", "-A"] + list(args)
     return run( *args, env=sudo_env, **kwargs )
 
 def notify(title, text, id_to_replace=None, timeout=-1, urgency=1):
@@ -122,7 +125,7 @@ def lastpass_import(host):
             return
 
         info = []
-        for row in csv.reader(lpassinfo.split("\r\n")):
+        for row in csv.reader( io.StringIO(lpassinfo) ):
             if len(row)>0 and host in row[0]:
                 info.append( {'user': row[1], 'pass':row[2], 'lp_url': row[0], 'lp_extra':row[3], 'lp_name':row[4], 'lp_grouping':row[5], 'lp_fav':row[6]} )
 
@@ -147,8 +150,8 @@ def make_sure_mapper_present():
         try:
             # I don't like getting in the middle, but GPG might ask for a pin and
             # we need to wait for it, because sudo's pinentry would force cancel it.
-            key = run("gpg2", "--decrypt", password_key)
-            sudo("cryptsetup", "luksOpen", "--key-file=-", password_img, dmcrypt_mapping_name, input=key)
+            key = run("gpg2", "--decrypt", password_key, universal_newlines=False)
+            sudo("cryptsetup", "luksOpen", "--key-file=-", password_img, dmcrypt_mapping_name, input=key, universal_newlines=False)
             key='' # Probably ineffective, but we can try
 
         finally:
