@@ -1,0 +1,12 @@
+[Unit]
+Description=Simple event hooks
+Requires=kooh.socket
+After=kooh.socket
+## This is a socket-activated service:
+RefuseManualStart=true
+
+[Service]
+SyslogIdentifier=kooh
+ExecStart=/bin/sh %h/bin/kooh.sh
+StandardInput=socket
+StandardOutput=journal

@@ -1,0 +1,10 @@
+[Unit]
+Description=Simple event hooks
+
+[Socket]
+ListenFIFO=%t/kooh/kooh
+SocketMode=0600
+DirectoryMode=0700
+
+[Install]
+WantedBy=sockets.target
