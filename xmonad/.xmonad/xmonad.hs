@@ -163,6 +163,7 @@ shotKeymap = -- Screen Shot
 mainKeymap c = mkKeymap c $
     [ ("M-S-<Return>", spawn myTerminal) -- Terminal
     , ("M-p",          spawn "dmenu_run") -- Dmenu
+    , ("M-c",          spawn "pass.py")
     , ("M-S-c",        kill)
     , ("M-<Space>",    sendMessage NextLayout) -- Next Layout
     , ("M-<Tab>",      nextWindow) -- Next Window
