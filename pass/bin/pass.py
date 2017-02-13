@@ -8,8 +8,15 @@ Allows single paste of username, then single paste of password.
 
 Most feedback is through libnotify Notifications.
 
-Can automatically infer hostname from current window title (set
-ui.window-title-format to `Qute|{host}`), or accept command line argument.
+Can automatically infer hostname from current window title or accept command
+line argument.
+
+Qutebrowser:
+  :set ui window-title-format to `{title}|{host}`
+
+Chromium:
+  Install https://chrome.google.com/webstore/detail/url-in-title/ignpacbgnbnkaiooknalneoeladjnfgb
+  Set format to `{title}|{hostname}`
 
 Hosts are stored under a by-host/ directory in password store.
 
