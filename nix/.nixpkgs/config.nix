@@ -11,36 +11,130 @@
     # override changes arguments to derivation (ex options and dependencies)
     # overrideAttrs changes the attrs of the actual derivation (ex version, build steps)
     #
-    qutebrowser = (originalPackages.qutebrowser.override {
-      ##
-      # fix qtwebkit-plugins so notifications and spellcheck work
-      ##
-      qtwebkit-plugins = originalPackages.qt5.qtwebkit-plugins.overrideAttrs(oldAttrs: {
-        postPatch = oldAttrs.postPatch + ''
-          sed -i "s,plugin.h,plugin.h ${newPackages.qt5.qtwebkit.dev}/include/QtWebKit/qwebkitplatformplugin.h," src/src.pro  
-        '';
-      });
+    # qutebrowser = (originalPackages.qutebrowser.override {
+    #   ##
+    #   # fix qtwebkit-plugins so notifications and spellcheck work
+    #   ##
+    #   qtwebkit-plugins = originalPackages.libsForQt5.qtwebkit-plugins.overrideAttrs(oldAttrs: {
+    #     postPatch = oldAttrs.postPatch + ''
+    #       sed -i "s,plugin.h,plugin.h ${newPackages.qt5.qtwebkit.dev}/include/QtWebKit/qwebkitplatformplugin.h," src/src.pro
+    #     '';
+    #   });
 
-      ##
-      # qtwebengine
-      ##
-      pyqt5 = originalPackages.python3Packages.pyqt5.overrideAttrs(oldAttrs: {
-        buildInputs = oldAttrs.buildInputs ++ [ originalPackages.qt5.qtwebengine ];
-      });
+    #   ##
+    #   # qtwebengine
+    #   ##
+    #   pyqt5 = originalPackages.python3Packages.pyqt5.overrideAttrs(oldAttrs: {
+    #     buildInputs = oldAttrs.buildInputs ++ [ originalPackages.qt5.qtwebengine originalPackages.nss ];
+    #   });
 
-    }).overrideAttrs(oldAttrs: rec {
-      ##
-      # 0.9.0 -> 0.9.1
-      ##
-      version = assert oldAttrs.version == "0.9.0"; "0.9.1";
-      name = "qutebrowser-${version}";
-      src = originalPackages.fetchurl {
-        url = "https://github.com/The-Compiler/qutebrowser/releases/download/v${version}/${name}.tar.gz";
-        sha256 = "0pf91nc0xcykahc3x7ww525c9czm8zpg80nxl8n2mrzc4ilgvass";
+    # }).overrideAttrs(oldAttrs: rec {
+    #   ##
+    #   # support spaces in keybindings by surrounding with quotes
+    #   ##
+    #   postPatch = oldAttrs.postPatch + ''
+    #     sed -i 's,line = line.strip(),line = (lambda l: l[1:-1] if l.startswith("\\x22") and line.endswith("\\x22") else l)(line.strip()),' qutebrowser/config/parsers/keyconf.py
+    #     sed -i "s,lines.append(' ' [*] 4 [+] k),lines.append(' ' * 4 + '\"' + k + '\"')," qutebrowser/config/parsers/keyconf.py
+    #   '';
+    # });
+
+    #-------#
+    # dunst #
+    #-------#
+    #
+    # Use more recent version from git
+    #
+    dunst = originalPackages.dunst.overrideAttrs(oldAttrs: rec {
+      version = assert oldAttrs.version == "1.1.0"; "1.1.0_1_3f5257f";
+      name = "dunst-${version}";
+      src = originalPackages.fetchFromGitHub {
+        owner = "knopwob";
+        repo = "dunst";
+        rev = "3f5257f2853220fb9e3c51459446d576f5a580ac";
+        sha256 = "0rycrddbj5lb8ykjb9b2f1vbzxax7maldxdbyxa1idi9y7924va7";
       };
+      patches = [];
+      buildInputs = oldAttrs.buildInputs ++ [ originalPackages.gnome2.gtk ];
     });
 
-    #----------------------------------------# 
+    #----#
+    # hy #
+    #----#
+    #
+    # use python3, use version 0.12.1
+    # `doCheck = false` doesn't seem to work with override, so just redefine the
+    # whole thing.
+    #
+    hy = originalPackages.python35Packages.buildPythonApplication rec {
+      name = "hy-${version}";
+      version = "0.12.1";
+      src = originalPackages.fetchurl {
+        url = "mirror://pypi/h/hy/${name}.tar.gz";
+        sha256 = "1fjip998k336r26i1gpri18syvfjg7z46wng1n58dmc238wm53sx";
+      };
+      propagatedBuildInputs = with originalPackages.python35Packages; [ appdirs clint astor rply ];
+      doCheck = false;
+    };
+
+    #----------------#
+    # notify-desktop #
+    #----------------#
+    #
+    notify-desktop = originalPackages.stdenv.mkDerivation rec {
+      name = "notify-desktop-${version}";
+      version = "0.2.0-9863919";
+      src = originalPackages.fetchFromGitHub {
+        owner = "nowrep";
+        repo = "notify-desktop";
+        rev = "9863919fb4ce7820810ac14a09a46ee73c3d56cc";
+        sha256 = "1brcvl2fx0yzxj9mc8hzfl32zdka1f1bxpzsclcsjplyakyinr1a";
+      };
+
+      postPatch = ''substituteInPlace src/Makefile --replace "/usr/bin" "$out/bin"'';
+      preInstall = ''mkdir -p $out/bin'';
+
+      buildInputs = [originalPackages.pkgconfig originalPackages.dbus];
+    };
+
+    #--------#
+    # deepms #
+    #--------#
+    #
+    ddccontrol = originalPackages.ddccontrol.overrideAttrs( origAttrs: rec {
+      postInstall = ''
+        cp src/config.h $out/include/ddccontrol/config.h
+      '';
+    });
+
+    deepms = originalPackages.stdenv.mkDerivation rec {
+      name = "deepms-${version}";
+      version = "0.0.1-76b87bb";
+      src = originalPackages.fetchFromGitHub {
+        owner = "pitkley";
+        repo = "deepms";
+        rev = "76b87bbb83b293d1ec570120a3a29f0b4dc76b23";
+        sha256 = "1hi44gs83bx8g3597l7aib5xxljmxszjwfl1k91kca80hksq8kxm";
+      };
+
+      postPatch = ''
+        echo -e '\nINSTALL(TARGETS deepms DESTINATION ''${CMAKE_INSTALL_PREFIX}/bin)' >> CMakeLists.txt
+      '';
+      buildInputs = with originalPackages; [ cmake newPackages.ddccontrol libxml2 x11 xorg.libXext ];
+    };
+
+    #-------------#
+    # opencv-java #
+    #-------------#
+    opencv-java = (originalPackages.opencv3.override {
+        enableFfmpeg = true;
+        enableContrib = true;
+    }).overrideAttrs( origAttrs: rec {
+        name = "${origAttrs.name}-java";
+        cmakeFlags = origAttrs.cmakeFlags ++ ["-DBUILD_SHARED_LIBS=OFF"];
+        buildInputs = origAttrs.buildInputs ++ [ originalPackages.ant originalPackages.pythonPackages.python ];
+        propagatedBuildInputs = origAttrs.propagatedBuildInputs ++ [ originalPackages.jdk ];
+    });
+    #----------------------------------------#
     # Packages installed in user environment #
     #----------------------------------------#
     #
@@ -66,9 +160,9 @@
         ag
         chromium
         compton
-        davmail
+        #davmail
         dmenu2
-        docker
+        #docker
         dos2unix
         dtrx
         dunst

@@ -163,7 +163,7 @@ shotKeymap = -- Screen Shot
 mainKeymap c = mkKeymap c $
     [ ("M-S-<Return>", spawn myTerminal) -- Terminal
     , ("M-p",          spawn "dmenu_run") -- Dmenu
-    , ("M-c",          spawn "pass.py")
+    , ("M-c",          spawn "pass.hy")
     , ("M-S-c",        kill)
     , ("M-<Space>",    sendMessage NextLayout) -- Next Layout
     , ("M-<Tab>",      nextWindow) -- Next Window
@@ -278,6 +278,7 @@ myManageHook = composeOne
   , resource  =? "kdesktop"       -?> doIgnore
   , className =? "Xfce4-notifyd"  -?> doIgnore
   , className =? "pinentry-gtk-2" -?> doFloat
+  , className =? "streaming_client" -?> doIgnore
   , role      =? "pop-up"         -?> doCenterFloat
   , isDialog                      -?> doCenterFloat
   , transience -- I don't actually understand what this does

@@ -28,7 +28,7 @@ hsetroot -solid '#666666'
 export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
 
 ## Start systemd user services.
-systemctl --user import-environment DISPLAY
+systemctl --user import-environment DISPLAY DBUS_SESSION_BUS_ADDRESS
 systemctl --user start X.target
 
 # note: dunst is started on demand from dbus via

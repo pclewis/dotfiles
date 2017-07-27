@@ -1,4 +1,5 @@
 #! /usr/bin/env nix-shell
+;; -*- inferior-lisp-program: "nix-shell -p hy python35Packages.pyyaml pass xdotool xclip rofi --run hy"; -*-
 "
 #! nix-shell -i hy -p hy python35Packages.pyyaml pass xdotool xclip rofi
 "
@@ -95,7 +96,7 @@
 
 (defn extract-hostname-from-window-title [s]
   (when (in "|" s)
-    (get (.split s "|") 1)))
+    (get (.rsplit s "|" 1) 1)))
 
 (defn pass/show [name]
   (try (run "pass" "show" name)
@@ -165,15 +166,19 @@
                 (set-yaml-for-host host docs)
                 docs))))
 
-(defn describe-doc [doc]
-  (some (fn [k] (.get doc k None))
-        [:user :lp_name :lp_url]))
+(defn describe-entry [entry]
+  (or
+   (some (fn [k] (.get entry k None))
+         [:user :lp_name :lp_url])
+   "(no description)"))
 
 (defn pick-doc [docs]
   (if (= 1 (len docs))
     {:pass (first docs)}
     (if (< 1 (len (second docs)))
-      (user-select (dict-comp (describe-doc d) d [d docs]))
+      (user-select "user:" (dict-comp (describe-entry entry)
+                                      entry
+                                      [entry (second docs)]))
       (first (second docs)))))
 
 (defmain [&rest args]
@@ -201,7 +206,3 @@
               (paste-once val))))))
 
     (notify host "Done!" :timeout 1000 :urgency 0)))
-
-;; Local Variables:
-;; inferior-lisp-program: "nix-shell -p hy python35Packages.pyyaml pass xdotool xclip rofi --run hy"
-;; End:
