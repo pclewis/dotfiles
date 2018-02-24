@@ -9,6 +9,8 @@ setopt PROMPT_SUBST
 RPROMPT=""
 PROMPT=$'$(_colorize $USER)%F{8}@%f$(_colorize $HOST)%F{8}:%f$(_prompt_pwd)%F{8}%#%f '
 
+setopt prompt_sp
+
 # misc
 export EDITOR=vim
 
