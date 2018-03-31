@@ -91,7 +91,7 @@
   (run "xclip"
        "-quiet"
        "-selection" "CLIPBOARD"
-       "-l" "1"
+       "-l" "2"
        :input s))
 
 (defn extract-hostname-from-window-title [s]
