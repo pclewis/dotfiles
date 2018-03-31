@@ -63,3 +63,10 @@ URxvt*skipBuiltinGlyphs: true
 *.color19:      base02
 *.color20:      base04
 *.color21:      base06
+
+Xft.antialias:  rgba
+Xft.hinting:    1
+Xft.hintstyle:  hintfull
+Xft.lcdfilter:  lcddefault
+Xft.rgba:       rgb
+Xft.dpi:        96
