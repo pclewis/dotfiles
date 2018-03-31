@@ -286,7 +286,7 @@ myManageHook = composeOne
   , resource  =? "kdesktop"       -?> doIgnore
   , className =? "Xfce4-notifyd"  -?> doIgnore
   , className =? "pinentry-gtk-2" -?> doFloat
-  , className =? "streaming_client" -?> doIgnore
+  --, className =? "streaming_client" -?> doIgnore
   , role      =? "pop-up"         -?> doCenterFloat
   , isDialog                      -?> doCenterFloat
   , transience -- I don't actually understand what this does
