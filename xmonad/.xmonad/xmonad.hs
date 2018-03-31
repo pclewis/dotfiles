@@ -240,7 +240,15 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
 -- which denotes layout choice.
 --
 gap = 8
-myLayout = gaps [(U,gap),(D,gap),(L,gap),(R,gap)] $ spacing gap $ smartBorders $ column ||| tiled ||| Mirror tiled ||| Full ||| Dishes 1 (1/6) ||| (mastered (1/100) (2/5) (Dishes 1 (1/6)))
+myLayout = gaps [(U,gap),(D,gap),(L,gap),(R,gap)] $ spacing gap $ smartBorders
+  $   column
+  ||| tiled
+  ||| Mirror tiled
+  ||| Full
+  ||| Dishes 1 (1/6)
+  ||| (mastered (1/100) (2/5) (Dishes 1 (1/6)))
+  ||| ThreeCol 1 (3/100) (1/3)
+  ||| ThreeColMid 1 (3/100) (1/3)
   where
      column = Column 1
      -- default tiling algorithm partitions the screen into two panes
