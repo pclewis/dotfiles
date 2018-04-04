@@ -52,6 +52,7 @@ values."
      syntax-checking
      version-control
      clojure
+     pcl
      haskell
      html
      python
@@ -71,9 +72,8 @@ values."
    ;; configuration in `dotspacemacs/user-config'.
    dotspacemacs-additional-packages
    '(
-     visual-fill-column
-     xterm-color
-     mixed-pitch
+     ;visual-fill-column
+     ;;mixed-pitch
      ;auto-dim-other-buffers
      ;evil-terminal-cursor-changer
      )
@@ -163,7 +163,7 @@ values."
                                :size 12.0
                                :weight normal
                                :width normal
-                               :powerline-scale 1.1)
+                               :powerline-scale 1.4)
    ;; The leader key
    dotspacemacs-leader-key "SPC"
    ;; The key used for Emacs commands (M-x) (after pressing on the leader key).
@@ -320,96 +320,6 @@ values."
    dotspacemacs-whitespace-cleanup nil
    ))
 
-(defun pcl/fix-terminal-keys ()
-  (define-key input-decode-map (kbd "M-O a") [C-up])
-  (define-key input-decode-map (kbd "M-O b") [C-down])
-  (define-key input-decode-map (kbd "M-O c") [C-right])
-  (define-key input-decode-map (kbd "M-O d") [C-left])
-  (define-key input-decode-map (kbd "ESC M-O A") [M-up])
-  (define-key input-decode-map (kbd "ESC M-O B") [M-down])
-  (define-key input-decode-map (kbd "ESC M-O C") [M-right])
-  (define-key input-decode-map (kbd "ESC M-O D") [M-left]))
-
-(defun pcl/fix-powerline ()
-  (setq powerline-default-separator (if (display-graphic-p) 'wave 'utf-8)))
-
-(defun pcl/eval-line-sexp ()
-   (interactive)
-   (setq evil-move-beyond-eol t)
-   (save-excursion (execute-kbd-macro (kbd "$,ee")))
-   (setq evil-move-beyond-eol nil))
-
-(defun pcl/eval-defun-not-comment ()
-  (interactive)
-  (save-excursion
-    (let ((last-pos (point)))
-      (condition-case nil
-          (while (not (string-equal "(comment"
-                                    (buffer-substring-no-properties (point) (+ (point) 8))))
-            (print          (buffer-substring-no-properties (point) (+ (point) 8)))
-            (setq last-pos (point))
-            (backward-up-list))
-        (scan-error nil))
-      (goto-char last-pos)
-      (execute-kbd-macro (kbd "va(,er"))
-      (evil-exit-visual-state))))
-
-(defun pcl/indent-sexp ()
-  (interactive)
-  (save-excursion
-    (execute-kbd-macro (kbd "va(=va("))
-    (call-interactively 'clojure-align)
-    (evil-exit-visual-state)))
-
-(defun pcl/indent-defun ()
-  (interactive)
-  (sp-indent-defun)
-  (call-interactively 'clojure-align))
-
-(defun pcl/blend-backgrounds (base tint subtlety)
-  (let ((base (color-name-to-rgb (face-attribute base :background)))
-        (tint (color-name-to-rgb (face-attribute tint :background))))
-    (apply 'color-rgb-to-hex
-            (second (color-gradient base tint subtlety)))))
-
-(defun pcl/get-evil-states ()
-  (mapcar 'first evil-state-properties))
-
-(defvar pcl/color-states '())
-
-(defface pcl-inactive
-  '((((class color) (min-colors 8)) :background "black"))
-  "Face for inactive buffers")
-
-(defvar-local pcl/face-remap-cookie nil)
-
-(defun pcl/set-overlay-color (&optional state)
-  (let* ((state (or state evil-next-state))
-         (face (or (intern-soft (format "pcl-%s" state))
-                   (intern-soft (format "spacemacs-%s-face" state)))))
-    (when pcl/face-remap-cookie
-      (face-remap-remove-relative pcl/face-remap-cookie)
-      (setq pcl/face-remap-cookie nil))
-    (if (and face (member state pcl/color-states))
-        (let ((blended (pcl/blend-backgrounds 'default face 20)) )
-          (setq pcl/face-remap-cookie
-                (face-remap-add-relative 'default :background blended))))))
-
-(defvar pcl/last-buffer nil)
-(defun pcl/highlight-active-buffer ()
-  (let ((buf (window-buffer)))
-    (unless (eq buf pcl/last-buffer)
-      (when (buffer-live-p pcl/last-buffer)
-        (with-current-buffer pcl/last-buffer
-          (pcl/set-overlay-color 'inactive)))
-      (pcl/set-overlay-color evil-state)
-      (setq pcl/last-buffer buf))))
-
-(defun pcl/overlay-add-hooks (&optional local)
-  (mapc (lambda (state)
-          (add-hook (intern (format "evil-%s-state-entry-hook" state))
-                    'pcl/set-overlay-color nil local))
-        (pcl/get-evil-states)))
 
 (defun dotspacemacs/user-init ()
   "Initialization function for user code.
@@ -425,247 +335,10 @@ before packages are loaded. If you are unsure, you should try in setting them in
  This function is called at the very end of Spacemacs initialization after
 layers configuration."
 
-  ;; useful insert mode keys
-  (define-key evil-insert-state-map (kbd "<C-up>")      'sp-raise-sexp)
-  (define-key evil-insert-state-map (kbd "<C-right>")   'sp-forward-slurp-sexp)
-  (define-key evil-insert-state-map (kbd "<C-left>")    'sp-forward-barf-sexp)
-  (define-key evil-insert-state-map (kbd "C-k")         'sp-kill-sexp)
+  ;; Personalization is all in pcl-layer
 
-  ;; Clojure stuff
-  (spacemacs/set-leader-keys-for-major-mode 'clojure-mode
-    "eE" 'pcl/eval-line-sexp
-    "eF" 'pcl/eval-defun-not-comment
-    "ix" 'pcl/indent-sexp
-    "if" 'pcl/indent-defun
-    "cm" 'clojure-convert-collection-to-map
-    "cs" 'clojure-convert-collection-to-set
-    "cl" 'clojure-convert-collection-to-list
-    "c'" 'clojure-convert-collection-to-quoted-list
-    "cv" 'clojure-convert-collection-to-vector)
-
-  ;; Hy stuff
-  (spacemacs/set-leader-keys-for-major-mode 'hy-mode
-    "ee" 'lisp-eval-last-sexp
-    "eE" 'pcl/eval-line-sexp
-    "ef" 'lisp-eval-defun
-    "eF" 'pcl/eval-defun-not-comment
-    "er" 'lisp-eval-region
-    "eb" (lambda () (interactive) (lisp-eval-region (point-min) (point-max)))
-    "ix" 'pcl/indent-sexp
-    "if" 'pcl/indent-defun)
-
-  ;; Add smartparens-strict-mode to all sp-lisp-modes hooks.
-  ;; from https://gitlab.com/mordocai/emacs.d/blob/master/packages/smartparens.el
-  ;; 2018-03-31 mordocai disappeared from internet, only trace at thinkingbicycle.net
-
-  (add-to-list 'sp-lisp-modes 'hy-mode)
-
-  (dolist (mode sp-lisp-modes)
-    (let ((hook-sym (intern (format "%s-hook" (symbol-name mode)))))
-      (add-hook hook-sym #'smartparens-strict-mode)
-      (add-hook hook-sym #'evil-cleverparens-mode)))
-
-  (pcl/overlay-add-hooks)
-  (setq pcl/color-states '(lisp emacs hybrid replace visual insert inactive))
-  (add-hook 'post-command-hook 'pcl/highlight-active-buffer)
-
-  (setq clojure-enable-fancify-symbols nil)
-  (setq clojure-align-forms-automatically t)
-
-  (setq cider-cljs-lein-repl "(do (use 'figwheel-sidecar.repl-api) (start-figwheel!) (cljs-repl))")
-
-  ;; fix PATH when run as service on nixos
-  (setenv "PATH" (concat (getenv "PATH") ":/run/current-system/sw/bin"))
-  (setq exec-path (append exec-path '("/run/current-system/sw/bin")))
-
-  ;; I should maybe learn to push SPC f s instead
-  (evil-ex-define-cmd "W" "w")
-
-  ;; terminal stuff
-  (xterm-mouse-mode -1)
-  (add-hook 'spaceline-pre-hook #'pcl/fix-powerline)
-  (add-hook 'terminal-init-xterm-hook #'pcl/fix-terminal-keys)
-
-  ;; Hack to disable GUI theme reload: unsafely assume last hook is the one that reloads theme
-  ;(setq spacemacs--after-display-system-init-list (butlast spacemacs--after-display-system-init-list))
-  ;; reload theme when terminal client connects so colors aren't terrible
-  (add-hook 'terminal-init-xterm-hook (lambda () (load-theme spacemacs--cur-theme t)))
-
-  (spacemacs/set-leader-keys "SPC" 'avy-goto-char)
-  (spacemacs/set-leader-keys "(" (lambda () (interactive) (avy-goto-char (string-to-char "("))))
-
-  (evil-define-key 'normal clojure-mode-map
-    "(" 'sp-next-sexp
-    ")" 'evil-next-close-paren)
-
-  (define-key evil-lisp-state-map "L" (evil-lisp-state-enter-command sp-next-sexp))
-  (define-key evil-lisp-state-map "a" (lambda () (interactive) (sp-forward-sexp) (evil-insert-state)))
-
-  (defun rubocop-bundled-p () "don't do it" nil)
-
-  (setq-default evil-escape-key-sequence "kj")
-
-  (add-hook 'prog-mode-hook 'turn-on-fci-mode)
-  (add-hook 'text-mode-hook 'turn-on-fci-mode)
-
-  (setq cider-repl-display-help-banner nil)
-  (setq cider-repl-pop-to-buffer-on-connect t)
-  (defun cider-repl--banner ()
-    "Generate the welcome REPL buffer banner."
-    (let ((host (cider--connection-host (current-buffer)))
-          (port (cider--connection-port (current-buffer))))
-      (format ";; Connected to nREPL server - nrepl://%s:%s
-;; CIDER %s, nREPL %s
-;; Clojure %s, Java %s"
-              host
-              port
-              (cider--version)
-              (cider--nrepl-version)
-              (cider--clojure-version)
-              (cider--java-version))))
-
-  (defun pcl/pretty-org-mode ()
-    ;; non-monospace font
-    (mixed-pitch-mode)
-
-    ;; pretty org mode headers
-    (dotimes (n 5)
-      (set-face-attribute
-       (intern (concat "org-level-" (number-to-string (1+ n))))
-       nil
-       :weight 'bold
-       :foreground "#d9d8df"
-       :background "#212026"
-       :underline nil
-       :height (max 0.8 (- 1.3 (* 0.2 n)))
-       :family "Caladea"))
-
-    (set-face-attribute 'org-level-1
-                        nil
-                        :underline nil
-                        :foreground "#ececef"
-                        :background "#212026"
-                        :box '(:line-width 1 :color "#393b3e") )
-
-    (set-face-attribute 'org-document-title nil
-                        :weight 'bold
-                        :foreground "#cccccc"
-                        :underline t
-                        :height 1.5
-                        :family "Caladea")
-
-    (set-face-attribute 'org-quote nil
-                        :foreground "#cccccc"
-                        :slant 'italic
-                        :inherit '(variable-pitch org-block))
-
-    ;; use fixed pitch font for indents so they are wider than
-    (set-face-attribute 'org-indent nil
-                        :height 0.7
-                        :inherit '(org-hide fixed-pitch))
-
-    (set-face-attribute 'org-ellipsis nil
-                        :height 0.6
-                        :underline nil
-                        :foreground "#ffffff")
-
-    (setq line-spacing nil)
-
-    ;; wrapping - need to toggle VLN to make it work right
-    (spacemacs/toggle-visual-line-navigation-off)
-
-    (fci-mode 0)
-    (visual-fill-column-mode 1)
-    (visual-line-mode 1)
-
-    (spacemacs/toggle-visual-line-navigation-on)
-
-    ;; hide bullets
-    (setq org-bullets-bullet-list '(" ")
-          org-bullets-face-name 'org-hide)
-
-    (org-bullets-mode 1))
-
-  (add-hook 'org-mode-hook #'pcl/pretty-org-mode)
-
-  (setq ;; pretty ellipsis
-        org-ellipsis "⮷"
-
-        ;; latex entities (\to \cup \cap etc), ^super, _sub
-        org-pretty-entities-include-sub-superscripts t
-        org-pretty-entities t
-
-        ;; use org-indent-mode by default
-        org-startup-indented t
-
-        ;; don't show ex slashes on /italic/
-        ;; note: breaks alignment inside table
-        org-hide-emphasis-markers t
-
-        ;; less indentation
-        ;; don't need this with zero-width space
-        ;;org-indent-indentation-per-level 1
-
-        ;; make first line align with following lines
-        ;; em space
-        ;;org-indent-boundary-char 8195
-        ;; zero-width space
-        ;; lines up correct with 0.7 height org-indent
-        org-indent-boundary-char 65279
-
-        ;; for pretty quotes
-        org-fontify-quote-and-verse-blocks 1
-
-        ;; show blank lines between headings
-        ;; actually I like default of 2 better
-        ;;org-cycle-separator-lines 1
-        org-cycle-separator-lines 2
-
-        ;; make heading background go for whole line
-        org-fontify-whole-heading-line t
-        )
-
-  ;; pretty bullet lists
-  (font-lock-add-keywords
-   'org-mode
-   '(("^ +\\([-*]\\) "
-      (0 (prog1 () (compose-region (match-beginning 1)
-                                   (match-end 1)
-                                   "•"))))))
-
-  ;; make latex bigger
-  (with-eval-after-load 'org
-    (setq org-format-latex-options (plist-put org-format-latex-options
-                                              :scale 1.5)))
- 
-  (use-package xterm-color))
-
-(defun lisp-state-insert-sexp-after (&optional arg)
-  "Insert sexp after the current one."
-  (interactive "P")
-  (let ((sp-navigate-consider-symbols nil))
-    (if (char-equal (char-after) ?\() (forward-char))
-    (sp-up-sexp)
-    (evil-insert-state)
-    (dotimes (_ (if arg (1+ arg) 1))
-      (sp-newline))
-    (sp-insert-pair "(")))
-
-(defun lisp-state-insert-sexp-before (&optional arg)
-  "Insert sexp before the current one."
-  (interactive "P")
-  (if (char-equal (char-after) ?\() (forward-char))
-  (sp-backward-up-sexp)
-  (evil-insert-state)
-  (save-excursion
-    (dotimes (_ (if arg (1+ arg) 1))
-      (sp-newline)))
-  (insert " ")
-  (sp-insert-pair "(")
-  (indent-for-tab-command)
-  (save-excursion
-    (evil-next-visual-line)
-    (indent-for-tab-command)))
+  ;; update font on SPC f e R
+  (spacemacs/set-default-font dotspacemacs-default-font))
 
 ;; Do not write anything past this comment. This is where Emacs will
 ;; auto-generate custom variable definitions.
@@ -676,14 +349,4 @@ layers configuration."
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (flyspell-correct-helm flyspell-correct auto-dictionary spray evil-cleverparens posframe mixed-pitch helm-w3m w3m org-category-capture org-mime ghub let-alist goto-chg undo-tree enh-ruby-mode web-beautify livid-mode skewer-mode simple-httpd json-mode json-snatcher json-reformat js2-refactor js2-mode js-doc company-tern dash-functional tern coffee-mode yaml-mode rvm ruby-tools ruby-test-mode rubocop rspec-mode robe rbenv projectile-rails rake minitest feature-mode chruby bundler inf-ruby winum fuzzy diminish seq csv-mode auto-dim-other-buffers nix-mode helm-nixos-options company-nixos-options nixos-options xterm-color yapfify sql-indent rainbow-mode rainbow-identifiers pyvenv pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode helm-pydoc cython-mode company-anaconda color-identifiers-mode anaconda-mode pythonic uuidgen pug-mode org-projectile org-download link-hint intero hlint-refactor hide-comnt helm-hoogle git-link eyebrowse evil-visual-mark-mode evil-unimpaired evil-ediff dumb-jump f company-ghci column-enforce-mode clojure-snippets ws-butler window-numbering web-mode volatile-highlights visual-fill-column vi-tilde-fringe toc-org tagedit spaceline powerline smooth-scrolling smeargle slim-mode shm scss-mode sass-mode restart-emacs rainbow-delimiters popwin persp-mode pcre2el paradox page-break-lines orgit org-repo-todo org-present org-pomodoro alert log4e gntp org-plus-contrib org-bullets open-junk-file neotree move-text mmm-mode markdown-toc markdown-mode magit-gitflow macrostep lorem-ipsum linum-relative leuven-theme less-css-mode jade-mode info+ indent-guide ido-vertical-mode hungry-delete htmlize hl-todo hindent highlight-parentheses highlight-numbers parent-mode highlight-indentation help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile helm-gitignore request helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag haskell-snippets haml-mode google-translate golden-ratio gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter gh-md flycheck-pos-tip flycheck-haskell flycheck flx-ido flx fill-column-indicator fancy-battery expand-region exec-path-from-shell evil-visualstar evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit magit magit-popup git-commit with-editor evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-args evil-anzu anzu emmet-mode elisp-slime-nav diff-hl define-word company-web web-completion-data company-statistics company-quickhelp pos-tip company-ghc ghc haskell-mode company-cabal company cmm-mode clj-refactor hydra inflections edn multiple-cursors paredit s peg clean-aindent-mode cider-eval-sexp-fu eval-sexp-fu highlight cider spinner queue pkg-info clojure-mode epl buffer-move bracketed-paste auto-yasnippet yasnippet auto-highlight-symbol auto-compile packed dash aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core async ac-ispell auto-complete popup quelpa package-build use-package which-key bind-key bind-map evil spacemacs-theme)))
- '(ruby-align-chained-calls t))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(company-tooltip-common ((t (:inherit company-tooltip :weight bold :underline nil))))
- '(company-tooltip-common-selection ((t (:inherit company-tooltip-selection :weight bold :underline nil))))
- '(variable-pitch ((t (:height 160 :family "Calibri")))))
-
+    (flyspell-correct-helm flyspell-correct auto-dictionary spray evil-cleverparens posframe mixed-pitch helm-w3m w3m org-category-capture org-mime ghub let-alist goto-chg undo-tree enh-ruby-mode web-beautify livid-mode skewer-mode simple-httpd json-mode json-snatcher json-reformat js2-refactor js2-mode js-doc company-tern dash-functional tern coffee-mode yaml-mode rvm ruby-tools ruby-test-mode rubocop rspec-mode robe rbenv projectile-rails rake minitest feature-mode chruby bundler inf-ruby winum fuzzy diminish seq csv-mode auto-dim-other-buffers nix-mode helm-nixos-options company-nixos-options nixos-options xterm-color yapfify sql-indent rainbow-mode rainbow-identifiers pyvenv pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode helm-pydoc cython-mode company-anaconda color-identifiers-mode anaconda-mode pythonic uuidgen pug-mode org-projectile org-download link-hint intero hlint-refactor hide-comnt helm-hoogle git-link eyebrowse evil-visual-mark-mode evil-unimpaired evil-ediff dumb-jump f company-ghci column-enforce-mode clojure-snippets ws-butler window-numbering web-mode volatile-highlights visual-fill-column vi-tilde-fringe toc-org tagedit spaceline powerline smooth-scrolling smeargle slim-mode shm scss-mode sass-mode restart-emacs rainbow-delimiters popwin persp-mode pcre2el paradox page-break-lines orgit org-repo-todo org-present org-pomodoro alert log4e gntp org-plus-contrib org-bullets open-junk-file neotree move-text mmm-mode markdown-toc markdown-mode magit-gitflow macrostep lorem-ipsum linum-relative leuven-theme less-css-mode jade-mode info+ indent-guide ido-vertical-mode hungry-delete htmlize hl-todo hindent highlight-parentheses highlight-numbers parent-mode highlight-indentation help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile helm-gitignore request helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag haskell-snippets haml-mode google-translate golden-ratio gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter gh-md flycheck-pos-tip flycheck-haskell flycheck flx-ido flx fill-column-indicator fancy-battery expand-region exec-path-from-shell evil-visualstar evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit magit magit-popup git-commit with-editor evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-args evil-anzu anzu emmet-mode elisp-slime-nav diff-hl define-word company-web web-completion-data company-statistics company-quickhelp pos-tip company-ghc ghc haskell-mode company-cabal company cmm-mode clj-refactor hydra inflections edn multiple-cursors paredit s peg clean-aindent-mode cider-eval-sexp-fu eval-sexp-fu highlight cider spinner queue pkg-info clojure-mode epl buffer-move bracketed-paste auto-yasnippet yasnippet auto-highlight-symbol auto-compile packed dash aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core async ac-ispell auto-complete popup quelpa package-build use-package which-key bind-key bind-map evil spacemacs-theme))))

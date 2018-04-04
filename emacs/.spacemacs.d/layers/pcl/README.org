@@ -1,0 +1,591 @@
+* Initialization
+
+Create package list that will be added to later. This is normally a defconst, but I don't want to have to put everything in one place.
+
+#+BEGIN_SRC emacs-lisp :tangle packages.el
+(defvar pcl-packages '())
+#+END_SRC
+
+
+* Clojure
+** Initialization
+
+Bring in the Clojure layer.
+
+#+BEGIN_SRC emacs-lisp :tangle layers.el
+(configuration-layer/declare-layer 'clojure)
+#+END_SRC
+
+** Evaluate sexp ending on this line
+
+In evil mode we cannot normally move past the end of the line, so when using ~,ee~ (=cider-eval-last-sexp=) we end up evaluating the last inner form instead of the outer form. There is a setting called =evil-move-beyond-eol= that makes it possible to move past the end of the line, but I don't like having it on all the time.
+
+In practice, l usually seem to forget I made this and just add a new line to use ~,ee~.
+
+Alternative ideas:
+ - make a keybind to toggle =evil-move-beyond-eol=
+ - turn on =evil-move-beyond-eol= in Clojure/Lisp files
+
+#+BEGIN_SRC emacs-lisp :tangle keybindings.el
+(spacemacs/set-leader-keys-for-major-mode 'clojure-mode
+  "eE" 'pcl/eval-line-sexp)
+#+END_SRC
+#+BEGIN_SRC emacs-lisp :tangle funcs.el
+(defun pcl/eval-line-sexp ()
+  (interactive)
+  (let ((evil-move-beyond-eol t))
+    (save-excursion (execute-kbd-macro (kbd "$,ee")))))
+#+END_SRC
+
+** Evaluate highest-level non-comment form
+
+~,ef~ (=cider-eval-defun-at-point=) evaluates the top-level form, which saves us moving the cursor around like with ~,ee~, but sometimes I have a ~defn~ or other form inside of a comment that I want to evaluate.
+
+#+BEGIN_SRC emacs-lisp :tangle keybindings.el
+(spacemacs/set-leader-keys-for-major-mode 'clojure-mode
+  "eF" 'pcl-clojure/eval-defun-not-comment)
+#+END_SRC
+#+BEGIN_SRC emacs-lisp :tangle funcs.el
+(defun pcl-clojure/eval-defun-not-comment ()
+  (interactive)
+  (save-excursion
+    (let ((last-pos (point)))
+      (condition-case nil
+          (while (not (string-equal "(comment"
+                                    (buffer-substring-no-properties
+                                     (point) (+ (point) 8))))
+            (print (buffer-substring-no-properties (point) (+ (point) 8)))
+            (setq last-pos (point))
+            (backward-up-list 1 t t))
+        (scan-error nil))
+      (goto-char last-pos)
+      (execute-kbd-macro (kbd "va(,er"))
+      (evil-exit-visual-state))))
+#+END_SRC
+
+** Indent sexp
+#+BEGIN_SRC emacs-lisp :tangle keybindings.el
+(spacemacs/set-leader-keys-for-major-mode 'clojure-mode
+  "ix" 'pcl-clojure/indent-sexp)
+#+END_SRC
+#+BEGIN_SRC emacs-lisp :tangle funcs.el
+(defun pcl-clojure/indent-sexp ()
+  (interactive)
+  (save-excursion
+    (execute-kbd-macro (kbd "va(=va("))
+    (call-interactively 'clojure-align)
+    (evil-exit-visual-state)))
+#+END_SRC
+
+** Indent defun
+#+BEGIN_SRC emacs-lisp :tangle keybindings.el
+(spacemacs/set-leader-keys-for-major-mode 'clojure-mode
+  "if" 'pcl-clojure/indent-defun)
+#+END_SRC
+#+BEGIN_SRC emacs-lisp :tangle funcs.el
+(defun pcl-clojure/indent-defun ()
+  (interactive)
+  (sp-indent-defun)
+  (call-interactively 'clojure-align))
+#+END_SRC
+
+** Quick collection conversions
+#+BEGIN_SRC emacs-lisp :tangle keybindings.el
+(spacemacs/set-leader-keys-for-major-mode 'clojure-mode
+  "cm" 'clojure-convert-collection-to-map
+  "cs" 'clojure-convert-collection-to-set
+  "cl" 'clojure-convert-collection-to-list
+  "c'" 'clojure-convert-collection-to-quoted-list
+  "cv" 'clojure-convert-collection-to-vector)
+#+END_SRC
+
+** Align forms automatically
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(setq clojure-align-forms-automatically t)
+#+END_SRC
+
+** Navigation in normal mode
+#+BEGIN_SRC emacs-lisp :tangle keybindings.el
+(evil-define-key 'normal clojure-mode-map
+  "(" 'sp-next-sexp
+  ")" 'evil-next-close-paren)
+#+END_SRC
+
+** Get rid of CIDER banner
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(setq cider-repl-display-help-banner nil)
+(setq cider-repl-pop-to-buffer-on-connect t)
+(with-eval-after-load 'cider
+  (defun cider-repl--banner ()
+    "Generate the welcome REPL buffer banner."
+    (let ((host (cider--connection-host (current-buffer)))
+          (port (cider--connection-port (current-buffer))))
+      (format ";; Connected to nREPL server - nrepl://%s:%s
+;; CIDER %s, nREPL %s
+;; Clojure %s, Java %s"
+              host
+              port
+              (cider--version)
+              (cider--nrepl-version)
+              (cider--clojure-version)
+              (cider--java-version)))))
+#+END_SRC
+
+** Stuff I'm not sure about anymore
+#+BEGIN_SRC emacs-lisp
+(setq clojure-enable-fancify-symbols nil)
+(setq cider-cljs-lein-repl "(do (use 'figwheel-sidecar.repl-api) (start-figwheel!) (cljs-repl))")
+#+END_SRC
+
+
+* Hy
+
+#+BEGIN_SRC emacs-lisp :tangle keybindings.el
+;; Hy stuff
+(spacemacs/set-leader-keys-for-major-mode 'hy-mode
+  "ee" 'lisp-eval-last-sexp
+  "eE" 'pcl/eval-line-sexp
+  "ef" 'lisp-eval-defun
+  "eF" 'pcl/eval-defun-not-comment
+  "er" 'lisp-eval-region
+  "eb" (lambda () (interactive) (lisp-eval-region (point-min) (point-max)))
+  "ix" 'pcl/indent-sexp
+  "if" 'pcl/indent-defun)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp :tangle packages.el
+(with-eval-after-load 'sp
+  (add-to-list 'sp-lisp-modes 'hy-mode))
+#+END_SRC
+
+
+* Ruby
+** Don't use bundled rubocop
+
+I think I only need this on NixOS, but I don't really remember.
+
+#+BEGIN_SRC emacs-lisp :tangle funcs.el
+(defun rubocop-bundled-p () "don't do it" nil)
+#+END_SRC
+
+** Align chained calls
+
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(setq ruby-align-chained-calls t)
+#+END_SRC
+
+
+* Lisps in general
+** Smartparens strict mode in all lisp modes
+
+Originally inspired by https://gitlab.com/mordocai/emacs.d/blob/master/packages/smartparens.el
+
+As of [2018-03-31] the mordocai account is gone from both GitLab and GitHub and mordocai.net doesn't resolve.
+
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(with-eval-after-load 'sp
+  (dolist (mode sp-lisp-modes)
+    (let ((hook-sym (intern (format "%s-hook" (symbol-name mode)))))
+      (add-hook hook-sym #'smartparens-strict-mode)
+      (add-hook hook-sym #'evil-cleverparens-mode))))
+#+END_SRC
+
+** Useful insert mode keys
+
+Some paredit keys I can't unlearn.
+
+#+BEGIN_SRC emacs-lisp :tangle keybindings.el
+(define-key evil-insert-state-map (kbd "<C-up>")      'sp-raise-sexp)
+(define-key evil-insert-state-map (kbd "<C-right>")   'sp-forward-slurp-sexp)
+(define-key evil-insert-state-map (kbd "<C-left>")    'sp-forward-barf-sexp)
+(define-key evil-insert-state-map (kbd "C-k")         'sp-kill-sexp)
+#+END_SRC
+
+** Forward/back expression 
+
+#+BEGIN_SRC emacs-lisp :tangle keybindings.el
+(define-key evil-lisp-state-map "L" 
+  (evil-lisp-state-enter-command sp-next-sexp))
+(define-key evil-lisp-state-map "a"
+  (lambda () (interactive)
+    (sp-forward-sexp)
+    (evil-insert-state)))
+#+END_SRC
+
+** Add optional count to insert-sexp-before and after
+
+=SPC k (= and =SPC k )= insert an sexp before or after the current one, respectively, but they do it on the line immediately before or after. This adds an optional count which is the number of blank lines to add in between the current expression and the new one.
+
+#+BEGIN_SRC lisp
+(+ 1 1) ;; press ~1 SPC k )~ on this line
+
+() ;; new expression inserted here
+#+END_SRC
+
+Since this involves making a change in the middle of the function, I couldn't find a good way to do it without just copy-pasting the originals.
+
+#+BEGIN_SRC emacs-lisp :tangle funcs.el
+(defun lisp-state-insert-sexp-after (&optional arg)
+  "Insert sexp after the current one."
+  (interactive "P")
+  (let ((sp-navigate-consider-symbols nil))
+    (if (char-equal (char-after) ?\() (forward-char))
+    (sp-up-sexp)
+    (evil-insert-state)
+    (dotimes (_ (if arg (1+ arg) 1))
+      (sp-newline))
+    (sp-insert-pair "(")))
+
+(defun lisp-state-insert-sexp-before (&optional arg)
+  "Insert sexp before the current one."
+  (interactive "P")
+  (if (char-equal (char-after) ?\() (forward-char))
+  (sp-backward-up-sexp)
+  (evil-insert-state)
+  (save-excursion
+    (dotimes (_ (if arg (1+ arg) 1))
+      (sp-newline)))
+  (insert " ")
+  (sp-insert-pair "(")
+  (indent-for-tab-command)
+  (save-excursion
+    (evil-next-visual-line)
+    (indent-for-tab-command)))
+#+END_SRC
+
+
+* General
+** Make :W work as :w
+
+I should maybe learn to press ~SPC f S~ instead.
+
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(with-eval-after-load 'evil
+  (evil-ex-define-cmd "W" "w"))
+#+END_SRC
+
+** Change escape key sequence
+
+By default, Spacemacs makes it so pressing ~fd~ quickly is the same as pressing escape (see =evil-escape=). =fd= is a common variable name in C, so this is irritating. ~kjk~ works better for me.
+
+#+BEGIN_SRC emacs-lisp :tangle keybindings.el
+(setq-default evil-escape-key-sequence "kjk")
+#+END_SRC
+
+** Show marker at column 80
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(add-hook 'prog-mode-hook 'turn-on-fci-mode)
+(add-hook 'text-mode-hook 'turn-on-fci-mode)
+#+END_SRC
+
+** Make SPC SPC jump to character like it used to
+~SPC SPC~ being mapped to ~M-x~ seems totally useless to me.
+#+BEGIN_SRC emacs-lisp :tangle keybindings.el
+(spacemacs/set-leader-keys "SPC" 'avy-goto-char)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp :tangle keybindings.el
+(spacemacs/set-leader-keys "(" 
+  (lambda () (interactive)
+    (avy-goto-char (string-to-char "("))))
+#+END_SRC
+
+
+* Highlight entire buffer based on evil mode
+
+#+BEGIN_SRC emacs-lisp :tangle funcs.el
+(defvar pcl/color-states '(lisp emacs hybrid replace visual insert inactive))
+(defvar pcl/last-buffer nil)
+(defvar-local pcl/face-remap-cookie nil)
+
+(defface pcl-inactive
+  '((((class color) (min-colors 8)) :background "black"))
+  "Face for inactive buffers")
+
+(defun pcl/get-evil-states ()
+  (mapcar 'first evil-state-properties))
+
+(defun pcl/blend-backgrounds (base tint subtlety)
+  (let ((base (color-name-to-rgb (face-attribute base :background)))
+        (tint (color-name-to-rgb (face-attribute tint :background))))
+    (apply 'color-rgb-to-hex
+            (second (color-gradient base tint subtlety)))))
+
+(defun pcl/set-overlay-color (&optional state)
+  (let* ((state (or state evil-next-state))
+         (face (or (intern-soft (format "pcl-%s" state))
+                   (intern-soft (format "spacemacs-%s-face" state)))))
+    (when pcl/face-remap-cookie
+      (face-remap-remove-relative pcl/face-remap-cookie)
+      (setq pcl/face-remap-cookie nil))
+    (if (and face (member state pcl/color-states))
+        (let ((blended (pcl/blend-backgrounds 'default face 20)) )
+          (setq pcl/face-remap-cookie
+                (face-remap-add-relative 'default :background blended))))))
+
+(defun pcl/highlight-active-buffer ()
+  (let ((buf (window-buffer)))
+    (unless (eq buf pcl/last-buffer)
+      (when (buffer-live-p pcl/last-buffer)
+        (with-current-buffer pcl/last-buffer
+          (pcl/set-overlay-color 'inactive)))
+      (pcl/set-overlay-color evil-state)
+      (setq pcl/last-buffer buf))))
+
+(defun pcl/overlay-add-hooks (&optional local)
+  (mapc (lambda (state)
+          (add-hook (intern (format "evil-%s-state-entry-hook" state))
+                    'pcl/set-overlay-color nil local))
+        (pcl/get-evil-states)))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(with-eval-after-load 'evil (pcl/overlay-add-hooks))
+(add-hook 'post-command-hook 'pcl/highlight-active-buffer)
+#+END_SRC
+
+
+* Org mode
+
+** Appearance
+*** Non-monospace font for prose
+#+BEGIN_SRC emacs-lisp :tangle packages.el
+(add-to-list 'pcl-packages 'mixed-pitch)
+
+(defun pcl/init-mixed-pitch ()
+  (use-package mixed-pitch))
+#+END_SRC
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(add-hook 'org-mode-hook #'mixed-pitch-mode)
+#+END_SRC
+
+Fix indents:
+
+#+BEGIN_SRC emacs-lisp :tangle funcs.el
+(defun pcl.org/fixed-pitch-indents ()
+  (set-face-attribute 'org-indent nil
+                      :height 0.7
+                      :inherit '(org-hide fixed-pitch)))
+#+END_SRC
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(add-hook 'org-mode-hook #'pcl.org/fixed-pitch-indents)
+#+END_SRC
+
+Zero-width space makes wrapped lines align correctly with 0.7 height fixed-pitch org-indent.
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(setq org-indent-boundary-char 65279)
+#+END_SRC
+
+*** Headers
+#+BEGIN_SRC emacs-lisp :tangle funcs.el
+(defun pcl.org/pretty-headers ()
+  (dotimes (n 5)
+    (set-face-attribute
+     (intern (concat "org-level-" (number-to-string (1+ n))))
+     nil
+     :weight 'bold
+     :foreground "#d9d8df"
+     :background "#212026"
+     :height (max 0.8 (- 1.3 (* 0.2 n)))
+     :family "Caladea"))
+
+  (set-face-attribute 'org-level-1
+                      nil
+                      :foreground "#ececef"
+                      :background "#212026"
+                      :box '(:line-width 1 :color "#393b3e"))
+
+  (set-face-attribute 'org-document-title nil
+                      :weight 'bold
+                      :foreground "#cccccc"
+                      :underline t
+                      :height 1.5
+                      :family "Caladea")
+
+  ;; hide bullets
+  (setq org-bullets-bullet-list '(" ")
+        org-bullets-face-name 'org-hide)
+
+  (org-bullets-mode 1))
+#+END_SRC
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(add-hook 'org-mode-hook #'pcl.org/pretty-headers)
+(setq org-fontify-whole-heading-line t)
+#+END_SRC
+
+*** Quotes
+
+#+BEGIN_SRC emacs-lisp :tangle funcs.el
+(defun pcl.org/pretty-quotes ()
+  (set-face-attribute 'org-quote nil
+                      :foreground "#cccccc"
+                      :slant 'italic
+                      :inherit '(variable-pitch org-block)))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(add-hook 'org-mode-hook #'pcl.org/pretty-quotes)
+(setq org-fontify-quote-and-verse-blocks 1)
+#+END_SRC
+
+*** Ellipsis
+
+#+BEGIN_SRC emacs-lisp :tangle funcs.el
+(defun pcl.org/pretty-ellipsis ()
+  (set-face-attribute 'org-ellipsis nil
+                      :height 0.6
+                      :underline nil
+                      :foreground "#ffffff"))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(add-hook 'org-mode-hook #'pcl.org/pretty-ellipsis)
+(setq org-ellipsis "⮷")
+#+END_SRC
+
+*** Bullets for lists
+From http://www.howardism.org/Technical/Emacs/orgmode-wordprocessor.html
+#+BEGIN_SRC emacs-lisp :tangle config.el
+;; pretty bullet lists
+(font-lock-add-keywords
+  'org-mode
+  '(("^ +\\([-*]\\) "
+    (0 (prog1 () (compose-region (match-beginning 1)
+                                  (match-end 1)
+                                  "•"))))))
+#+END_SRC
+
+** Wrap at fill-column
+#+BEGIN_SRC emacs-lisp :tangle packages.el
+(add-to-list 'pcl-packages 'visual-fill-column)
+(defun pcl/init-visual-fill-column ()
+  (use-package visual-fill-column))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp :tangle funcs.el
+(defun pcl.org/wrap ()
+  ;; need to toggle VLN to make it work right
+  (spacemacs/toggle-visual-line-navigation-off)
+
+  (fci-mode 0)
+  (visual-fill-column-mode 1)
+  (visual-line-mode 1)
+
+  (spacemacs/toggle-visual-line-navigation-on))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(add-hook 'org-mode-hook #'pcl.org/wrap)
+#+END_SRC
+
+Adaptive wrap breaks everything.
+See https://github.com/syl20bnr/spacemacs/issues/1418
+#+BEGIN_SRC emacs-lisp :tangle packages.el
+(add-to-list 'pcl-packages '(adaptive-wrap :excluded t))
+#+END_SRC
+
+** Hide emphasis markers
+So =/asdf/= shows up as /asdf/, etc.
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(setq org-hide-emphasis-markers t)
+#+END_SRC
+
+** Indent by default
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(setq org-startup-indented t)
+#+END_SRC
+** LaTeX
+*** Make renders bigger
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(with-eval-after-load 'org
+  (setq org-format-latex-options (plist-put org-format-latex-options
+                                            :scale 1.5)))
+#+END_SRC
+
+*** Display entities at UTF-8 characters
+Ex: \{to,cap,cup,forall} = \to \cap \cup \forall
+Also subscripts and superscripts: 1^2 F_thrust
+
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(setq org-pretty-entities t
+      org-pretty-entities-include-sub-superscripts t)
+#+END_SRC
+
+** Source blocks
+*** Indentation
+From http://fgiasson.com/blog/index.php/2016/06/21/optimal-emacs-settings-for-org-mode-for-literate-programming/
+
+Don't add top-level indentation inside of source blocks.
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(setq org-edit-src-content-indentation 0)
+#+END_SRC
+
+Make tab key fix indentation inside of source blocks, instead of collapsing the block.
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(setq org-src-tab-acts-natively t)
+#+END_SRC
+
+*** Key to split
+~SPC j s~ splits an sexp, ~SPC m j s~ splits a SRC block.
+#+BEGIN_SRC emacs-lisp :tangle keybindings.el
+(spacemacs/set-leader-keys-for-major-mode 'org-mode
+  "js" 'org-babel-demarcate-block)
+#+END_SRC
+
+
+* Terminal fixes
+
+Not really using this stuff anymore.
+
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'pcl-packages 'xterm-color)
+(use-package xterm-color)
+
+(defun pcl/fix-terminal-keys ()
+  (define-key input-decode-map (kbd "M-O a") [C-up])
+  (define-key input-decode-map (kbd "M-O b") [C-down])
+  (define-key input-decode-map (kbd "M-O c") [C-right])
+  (define-key input-decode-map (kbd "M-O d") [C-left])
+  (define-key input-decode-map (kbd "ESC M-O A") [M-up])
+  (define-key input-decode-map (kbd "ESC M-O B") [M-down])
+  (define-key input-decode-map (kbd "ESC M-O C") [M-right])
+  (define-key input-decode-map (kbd "ESC M-O D") [M-left]))
+
+(defun pcl/fix-powerline ()
+  (setq powerline-default-separator (if (display-graphic-p) 'wave 'utf-8)))
+
+;; terminal stuff
+(xterm-mouse-mode -1)
+(add-hook 'spaceline-pre-hook #'pcl/fix-powerline)
+(add-hook 'terminal-init-xterm-hook #'pcl/fix-terminal-keys)
+
+;; Hack to disable GUI theme reload: unsafely assume last hook is the one that reloads theme
+;(setq spacemacs--after-display-system-init-list (butlast spacemacs--after-display-system-init-list))
+;; reload theme when terminal client connects so colors aren't terrible
+(add-hook 'terminal-init-xterm-hook (lambda () (load-theme spacemacs--cur-theme t)))
+
+#+END_SRC
+
+
+* OS-specific settings
+** NixOS
+*** Fix PATH when run as service
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(when (and (string-equal system-type "gnu/linux")
+           (file-directory-p "/run/current-system/sw/bin"))
+  (setenv "PATH" (concat (getenv "PATH") ":/run/current-system/sw/bin"))
+  (setq exec-path (append exec-path '("/run/current-system/sw/bin"))))
+#+END_SRC
+
+
+* Fonts
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(set-face-attribute 'variable-pitch nil
+                    :height 160 :family "Calibri")
+#+END_SRC
+
+
+* Tangle this file on save
+Local Variables:
+eval: (add-hook 'after-save-hook (lambda () (org-babel-tangle)) nil t)
+End:

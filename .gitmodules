@@ -4,3 +4,6 @@
 [submodule "zsh/.zsh/zsh-syntax-highlighting"]
 	path = zsh/.zsh/zsh-syntax-highlighting
 	url = https://github.com/zsh-users/zsh-syntax-highlighting.git
+[submodule "emacs/.spacemacs.d/layers/w3m"]
+	path = emacs/.spacemacs.d/layers/w3m
+	url = https://github.com/venmos/w3m-layer.git
