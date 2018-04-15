@@ -19,3 +19,6 @@ setopt NO_SHARE_HISTORY
 
 # fix ls
 export QUOTING_STYLE=literal
+
+# direnv
+eval "$(direnv hook zsh)"

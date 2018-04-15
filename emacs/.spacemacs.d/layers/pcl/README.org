@@ -290,6 +290,14 @@ By default, Spacemacs makes it so pressing ~fd~ quickly is the same as pressing 
     (avy-goto-char (string-to-char "("))))
 #+END_SRC
 
+** direnv
+#+BEGIN_SRC emacs-lisp :tangle packages.el
+(add-to-list 'pcl-packages 'direnv)
+
+(defun pcl/init-direnv ()
+  (use-package direnv :config (direnv-mode)))
+#+END_SRC
+
 
 * Highlight entire buffer based on evil mode
 

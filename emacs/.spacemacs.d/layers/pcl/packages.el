@@ -3,6 +3,11 @@
 (with-eval-after-load 'smartparens
   (add-to-list 'sp-lisp-modes 'hy-mode))
 
+(add-to-list 'pcl-packages 'direnv)
+
+(defun pcl/init-direnv ()
+  (use-package direnv :config (direnv-mode)))
+
 (add-to-list 'pcl-packages 'mixed-pitch)
 
 (defun pcl/init-mixed-pitch ()

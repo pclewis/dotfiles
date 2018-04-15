@@ -108,6 +108,7 @@
         anki
         chromium
         compton
+        direnv
         dmenu2
         docker
         dos2unix
