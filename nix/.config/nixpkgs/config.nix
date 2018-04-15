@@ -4,59 +4,6 @@
 
   packageOverrides = originalPackages: let newPackages = originalPackages.pkgs; in {
 
-    #-------------#
-    # qutebrowser #
-    #-------------#
-    #
-    # override changes arguments to derivation (ex options and dependencies)
-    # overrideAttrs changes the attrs of the actual derivation (ex version, build steps)
-    #
-    # qutebrowser = (originalPackages.qutebrowser.override {
-    #   ##
-    #   # fix qtwebkit-plugins so notifications and spellcheck work
-    #   ##
-    #   qtwebkit-plugins = originalPackages.libsForQt5.qtwebkit-plugins.overrideAttrs(oldAttrs: {
-    #     postPatch = oldAttrs.postPatch + ''
-    #       sed -i "s,plugin.h,plugin.h ${newPackages.qt5.qtwebkit.dev}/include/QtWebKit/qwebkitplatformplugin.h," src/src.pro
-    #     '';
-    #   });
-
-    #   ##
-    #   # qtwebengine
-    #   ##
-    #   pyqt5 = originalPackages.python3Packages.pyqt5.overrideAttrs(oldAttrs: {
-    #     buildInputs = oldAttrs.buildInputs ++ [ originalPackages.qt5.qtwebengine originalPackages.nss ];
-    #   });
-
-    # }).overrideAttrs(oldAttrs: rec {
-    #   ##
-    #   # support spaces in keybindings by surrounding with quotes
-    #   ##
-    #   postPatch = oldAttrs.postPatch + ''
-    #     sed -i 's,line = line.strip(),line = (lambda l: l[1:-1] if l.startswith("\\x22") and line.endswith("\\x22") else l)(line.strip()),' qutebrowser/config/parsers/keyconf.py
-    #     sed -i "s,lines.append(' ' [*] 4 [+] k),lines.append(' ' * 4 + '\"' + k + '\"')," qutebrowser/config/parsers/keyconf.py
-    #   '';
-    # });
-
-    #-------#
-    # dunst #
-    #-------#
-    #
-    # Use more recent version from git
-    #
-    dunst = originalPackages.dunst.overrideAttrs(oldAttrs: rec {
-      version = assert oldAttrs.version == "1.1.0"; "1.1.0_1_3f5257f";
-      name = "dunst-${version}";
-      src = originalPackages.fetchFromGitHub {
-        owner = "knopwob";
-        repo = "dunst";
-        rev = "3f5257f2853220fb9e3c51459446d576f5a580ac";
-        sha256 = "0rycrddbj5lb8ykjb9b2f1vbzxax7maldxdbyxa1idi9y7924va7";
-      };
-      patches = [];
-      buildInputs = oldAttrs.buildInputs ++ [ originalPackages.gnome2.gtk ];
-    });
-
     #----#
     # hy #
     #----#
