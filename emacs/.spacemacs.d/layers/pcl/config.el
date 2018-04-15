@@ -19,7 +19,7 @@
 
 (setq ruby-align-chained-calls t)
 
-(with-eval-after-load 'sp
+(with-eval-after-load 'smartparens
   (dolist (mode sp-lisp-modes)
     (let ((hook-sym (intern (format "%s-hook" (symbol-name mode)))))
       (add-hook hook-sym #'smartparens-strict-mode)

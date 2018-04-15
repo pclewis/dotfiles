@@ -154,7 +154,7 @@ Alternative ideas:
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp :tangle packages.el
-(with-eval-after-load 'sp
+(with-eval-after-load 'smartparens
   (add-to-list 'sp-lisp-modes 'hy-mode))
 #+END_SRC
 
@@ -183,7 +183,7 @@ Originally inspired by https://gitlab.com/mordocai/emacs.d/blob/master/packages/
 As of [2018-03-31] the mordocai account is gone from both GitLab and GitHub and mordocai.net doesn't resolve.
 
 #+BEGIN_SRC emacs-lisp :tangle config.el
-(with-eval-after-load 'sp
+(with-eval-after-load 'smartparens
   (dolist (mode sp-lisp-modes)
     (let ((hook-sym (intern (format "%s-hook" (symbol-name mode)))))
       (add-hook hook-sym #'smartparens-strict-mode)

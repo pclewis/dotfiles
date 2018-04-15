@@ -1,6 +1,6 @@
 (defvar pcl-packages '())
 
-(with-eval-after-load 'sp
+(with-eval-after-load 'smartparens
   (add-to-list 'sp-lisp-modes 'hy-mode))
 
 (add-to-list 'pcl-packages 'mixed-pitch)
