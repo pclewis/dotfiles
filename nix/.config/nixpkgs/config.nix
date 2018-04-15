@@ -81,6 +81,7 @@
         buildInputs = origAttrs.buildInputs ++ [ originalPackages.ant originalPackages.pythonPackages.python ];
         propagatedBuildInputs = origAttrs.propagatedBuildInputs ++ [ originalPackages.jdk ];
     });
+
     #----------------------------------------#
     # Packages installed in user environment #
     #----------------------------------------#
@@ -102,25 +103,28 @@
         catMeMaybe = x: attr: if builtins.hasAttr attr x then [(builtins.getAttr attr x)] else [];
         sections = ["man" "doc" "info"];
       in lib.concatMap (x: [x] ++ (lib.concatMap (catMeMaybe x) sections)) [
-        ack
         acpi
         ag
+        anki
         chromium
         compton
-        #davmail
         dmenu2
-        #docker
+        docker
         dos2unix
         dtrx
         dunst
         dzen2
         emacs
-        #firefox-bin
+        feh
+        file
+        font-manager
         git
         gnupg
         hsetroot
         htop
+        hy
         imagemagick
+        iotop
         jdk
         jq
         lastpass-cli
@@ -132,26 +136,40 @@
         mu
         ncmpcpp
         nmap
+        notify-desktop
         offlineimap
         p7zip
+        pass
+        patchelf
         pinentry
+        pstree
         pwgen
         python3
         qutebrowser
+        radare2
         rdesktop
+        rofi
         ruby
         rxvt_unicode
         scrot
+        sshfs-fuse
+        sshuttle
         stow
+        synergy
         tcpdump
         traceroute
         unclutter
         unzip
+        virtualbox
+        whois
+        wmctrl
         x11_ssh_askpass
         xclip
         xcompmgr
+        xdotool
         xlibs.xdpyinfo
         xscreensaver
+        xorg.xwininfo
         zip
       ];
     };
