@@ -4,6 +4,11 @@
 
   packageOverrides = originalPackages: let newPackages = originalPackages.pkgs; in {
 
+    #-----#
+    # jdk #
+    #-----#
+    jdk = originalPackages.jdk10;
+
     #----#
     # hy #
     #----#
@@ -79,8 +84,9 @@
         name = "${origAttrs.name}-java";
         cmakeFlags = origAttrs.cmakeFlags ++ ["-DBUILD_SHARED_LIBS=OFF"];
         buildInputs = origAttrs.buildInputs ++ [ originalPackages.ant originalPackages.pythonPackages.python ];
-        propagatedBuildInputs = origAttrs.propagatedBuildInputs ++ [ originalPackages.jdk ];
+        propagatedBuildInputs = origAttrs.propagatedBuildInputs ++ [ newPackages.jdk ];
     });
+
 
     #----------------------------------------#
     # Packages installed in user environment #
@@ -126,7 +132,7 @@
         hy
         imagemagick
         iotop
-        jdk
+        jdk10
         jq
         lastpass-cli
         leiningen
