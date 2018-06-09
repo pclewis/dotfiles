@@ -131,6 +131,11 @@ Alternative ideas:
               (cider--java-version)))))
 #+END_SRC
 
+** Use ipv4 for CIDER repl
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(setq cider-lein-parameters "repl :headless :host localhost")
+#+END_SRC
+
 ** Stuff I'm not sure about anymore
 #+BEGIN_SRC emacs-lisp
 (setq clojure-enable-fancify-symbols nil)
