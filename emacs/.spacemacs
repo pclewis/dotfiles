@@ -62,7 +62,7 @@ values."
      ;(ruby :variables ruby-enable-enh-ruby-mode t)
      ruby-on-rails
      w3m
-     evil-cleverparens
+     ;;evil-cleverparens
      speed-reading
      spell-checking
      )

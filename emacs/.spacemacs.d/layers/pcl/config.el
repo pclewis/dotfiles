@@ -22,8 +22,7 @@
 (with-eval-after-load 'smartparens
   (dolist (mode sp-lisp-modes)
     (let ((hook-sym (intern (format "%s-hook" (symbol-name mode)))))
-      (add-hook hook-sym #'smartparens-strict-mode)
-      (add-hook hook-sym #'evil-cleverparens-mode))))
+      (add-hook hook-sym #'smartparens-strict-mode))))
 
 (with-eval-after-load 'evil
   (evil-ex-define-cmd "W" "w"))
