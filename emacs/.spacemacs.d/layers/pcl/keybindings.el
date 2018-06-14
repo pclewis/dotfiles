@@ -1,16 +1,12 @@
-(spacemacs/set-leader-keys-for-major-mode 'clojure-mode
-  "eE" 'pcl/eval-line-sexp)
+(pcl/bind-clojure-keys "eE" 'pcl/eval-line-sexp)
 
-(spacemacs/set-leader-keys-for-major-mode 'clojure-mode
-  "eF" 'pcl-clojure/eval-defun-not-comment)
+(pcl/bind-clojure-keys "eF" 'pcl-clojure/eval-defun-not-comment)
 
-(spacemacs/set-leader-keys-for-major-mode 'clojure-mode
-  "ix" 'pcl-clojure/indent-sexp)
+(pcl/bind-clojure-keys "ix" 'pcl-clojure/indent-sexp)
 
-(spacemacs/set-leader-keys-for-major-mode 'clojure-mode
-  "if" 'pcl-clojure/indent-defun)
+(pcl/bind-clojure-keys "if" 'pcl-clojure/indent-defun)
 
-(spacemacs/set-leader-keys-for-major-mode 'clojure-mode
+(pcl/bind-clojure-keys
   "cm" 'clojure-convert-collection-to-map
   "cs" 'clojure-convert-collection-to-set
   "cl" 'clojure-convert-collection-to-list
@@ -20,6 +16,10 @@
 (evil-define-key 'normal clojure-mode-map
   "(" 'sp-next-sexp
   ")" 'evil-next-close-paren)
+
+(pcl/bind-clojure-keys "sS" 'cider-repl-set-ns)
+
+(pcl/bind-clojure-keys "gf" 're-frame-jump-to-reg)
 
 ;; Hy stuff
 (spacemacs/set-leader-keys-for-major-mode 'hy-mode

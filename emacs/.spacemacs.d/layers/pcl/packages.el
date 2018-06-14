@@ -1,5 +1,10 @@
 (defvar pcl-packages '())
 
+(add-to-list 'pcl-packages '(re-jump :location local))
+
+(defun pcl/init-re-jump ()
+  (use-package re-jump))
+
 (with-eval-after-load 'smartparens
   (add-to-list 'sp-lisp-modes 'hy-mode))
 

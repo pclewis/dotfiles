@@ -146,6 +146,17 @@ Alternative ideas:
 (pcl/bind-clojure-keys "sS" 'cider-repl-set-ns)
 #+END_SRC
 
+** re-frame jump to sub
+#+BEGIN_SRC emacs-lisp :tangle packages.el
+(add-to-list 'pcl-packages '(re-jump :location local))
+
+(defun pcl/init-re-jump ()
+  (use-package re-jump))
+#+END_SRC
+#+BEGIN_SRC emacs-lisp :tangle keybindings.el
+(pcl/bind-clojure-keys "gf" 're-frame-jump-to-reg)
+#+END_SRC
+
 ** Stuff I'm not sure about anymore
 #+BEGIN_SRC emacs-lisp
 (setq clojure-enable-fancify-symbols nil)

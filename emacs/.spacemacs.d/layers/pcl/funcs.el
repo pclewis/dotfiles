@@ -1,3 +1,7 @@
+(defun pcl/bind-clojure-keys (&rest bindings)
+  (dolist (m '(clojure-mode clojurec-mode clojurescript-mode))
+    (apply #'spacemacs/set-leader-keys-for-major-mode m bindings)))
+
 (defun pcl/eval-line-sexp ()
   (interactive)
   (let ((evil-move-beyond-eol t))

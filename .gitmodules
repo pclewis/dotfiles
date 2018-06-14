@@ -7,3 +7,6 @@
 [submodule "emacs/.spacemacs.d/layers/w3m"]
 	path = emacs/.spacemacs.d/layers/w3m
 	url = https://github.com/venmos/w3m-layer.git
+[submodule "emacs/.spacemacs.d/layers/pcl/lib/re-jump.el"]
+	path = emacs/.spacemacs.d/layers/pcl/local/re-jump
+	url = https://github.com/oliyh/re-jump.el.git

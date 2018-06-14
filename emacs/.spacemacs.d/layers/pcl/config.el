@@ -19,6 +19,8 @@
 
 (setq cider-lein-parameters "repl :headless :host localhost")
 
+(setq cider-jack-in-dependencies '(("nrepl" "0.3.1")))
+
 (setq ruby-align-chained-calls t)
 
 (with-eval-after-load 'smartparens
