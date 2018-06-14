@@ -141,6 +141,11 @@ Alternative ideas:
 (setq cider-jack-in-dependencies '(("nrepl" "0.3.1")))
 #+END_SRC
 
+** Cider set repl ns
+#+BEGIN_SRC emacs-lisp :tangle keybindings.el
+(pcl/bind-clojure-keys "sS" 'cider-repl-set-ns)
+#+END_SRC
+
 ** Stuff I'm not sure about anymore
 #+BEGIN_SRC emacs-lisp
 (setq clojure-enable-fancify-symbols nil)
