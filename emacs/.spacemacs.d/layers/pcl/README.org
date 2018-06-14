@@ -137,6 +137,8 @@ Alternative ideas:
 ** Use ipv4 for CIDER repl
 #+BEGIN_SRC emacs-lisp :tangle config.el
 (setq cider-lein-parameters "repl :headless :host localhost")
+
+(setq cider-jack-in-dependencies '(("nrepl" "0.3.1")))
 #+END_SRC
 
 ** Stuff I'm not sure about anymore
