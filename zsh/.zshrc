@@ -4,12 +4,6 @@ source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 # prompt
 source ~/.zsh/prompt.zsh
 
-setopt PROMPT_SUBST
-
-RPROMPT=""
-PROMPT=$'$(_colorize $USER)%F{8}@%f$(_colorize $HOST)%F{8}:%f$(_prompt_pwd)%F{8}%#%f '
-
-setopt prompt_sp
 # vim mode
 source ~/.zsh/vim.zsh
 

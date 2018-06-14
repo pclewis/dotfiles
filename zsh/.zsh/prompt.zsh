@@ -60,3 +60,31 @@ function _colorize() {
     #echo $'\e[38;5;'$n'm'$1'\e[0m'
     echo '%F{'$n'}'$1'%f'
 }
+
+
+## _old_prompt(input,cmd,fullcmd)
+#
+#  Make prompts look different when they're history
+#
+function _old_prompt() {
+    print -nP '%k%f%E'
+    tput cuu1
+    print -nP '%K{237}%E\r'
+    COL=$(($(tput cols) - 22))
+    print -nP "%K{237}$PROMPT%K{237}"
+    print -nR $1
+    print -nP "\e[${COL}G%F{240}" $(date '+[%Y-%m-%d %H:%M:%S]') '%k%f'
+}
+
+add-zsh-hook preexec _old_prompt
+
+# expand things in prompt
+setopt PROMPT_SUBST
+
+# When output doesn't end with newline, add a % and newline instead of
+# clobbering it with the prompt
+setopt PROMPT_SP
+
+# here it is, my beautiful prompt
+RPROMPT=""
+PROMPT=$'$(_colorize $USER)%F{8}@%f$(_colorize $HOST)%F{8}:%f$(_prompt_pwd)%F{8}%#%f %K{231}'
