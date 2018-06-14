@@ -10,6 +10,8 @@ RPROMPT=""
 PROMPT=$'$(_colorize $USER)%F{8}@%f$(_colorize $HOST)%F{8}:%f$(_prompt_pwd)%F{8}%#%f '
 
 setopt prompt_sp
+# vim mode
+source ~/.zsh/vim.zsh
 
 # misc
 export EDITOR=vim
