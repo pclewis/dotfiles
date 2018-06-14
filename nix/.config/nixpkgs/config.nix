@@ -2,12 +2,16 @@
 
   allowUnfree = true;
 
-  packageOverrides = originalPackages: let newPackages = originalPackages.pkgs; in {
+  packageOverrides = originalPackages:
+  let
+    newPackages = originalPackages.pkgs;
+    pclPackages = import <pclpkgs> {};
+  in {
 
     #-----#
     # jdk #
     #-----#
-    jdk = originalPackages.jdk10;
+    jdk = pclPackages.jdk10;
 
     #----#
     # hy #
@@ -132,7 +136,7 @@
         hy
         imagemagick
         iotop
-        jdk10
+        jdk
         jq
         lastpass-cli
         leiningen
