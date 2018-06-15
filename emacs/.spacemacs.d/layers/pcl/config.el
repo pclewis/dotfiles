@@ -77,6 +77,13 @@
 
 (setq org-src-tab-acts-natively t)
 
+(with-eval-after-load 'org
+  (org-babel-do-load-languages
+    'org-babel-load-languages
+    '((shell      . t)
+      (emacs-lisp . t)
+      (clojure    . t))))
+
 (when (and (string-equal system-type "gnu/linux")
            (file-directory-p "/run/current-system/sw/bin"))
   (setenv "PATH" (concat (getenv "PATH") ":/run/current-system/sw/bin"))

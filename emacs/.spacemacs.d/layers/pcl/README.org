@@ -565,6 +565,26 @@ Make tab key fix indentation inside of source blocks, instead of collapsing the 
   "js" 'org-babel-demarcate-block)
 #+END_SRC
 
+** Code evaluation
+*** Languages
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(with-eval-after-load 'org
+  (org-babel-do-load-languages
+    'org-babel-load-languages
+    '((shell      . t)
+      (emacs-lisp . t)
+      (clojure    . t))))
+#+END_SRC
+
+*** Add key to toggle requiring confirmation for eval
+#+BEGIN_SRC emacs-lisp :tangle keybindings.el
+(spacemacs|add-toggle org-confirm-babel-evaluate
+  :status org-confirm-babel-evaluate
+  :on (setq org-confirm-babel-evaluate 't)
+  :off (setq org-confirm-babel-evaluate nil)
+  :documentation "Confirm evaluation of code using babel."
+  :evil-leader "tb")
+#+END_SRC
 
 * Terminal fixes
 

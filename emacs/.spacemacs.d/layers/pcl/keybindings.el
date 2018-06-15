@@ -54,3 +54,10 @@
 
 (spacemacs/set-leader-keys-for-major-mode 'org-mode
   "js" 'org-babel-demarcate-block)
+
+(spacemacs|add-toggle org-confirm-babel-evaluate
+  :status org-confirm-babel-evaluate
+  :on (setq org-confirm-babel-evaluate 't)
+  :off (setq org-confirm-babel-evaluate nil)
+  :documentation "Confirm evaluation of code using babel."
+  :evil-leader "tb")
