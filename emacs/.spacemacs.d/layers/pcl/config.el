@@ -34,6 +34,11 @@
 (add-hook 'prog-mode-hook 'turn-on-fci-mode)
 (add-hook 'text-mode-hook 'turn-on-fci-mode)
 
+(setq auto-completion-return-key-behavior nil
+      auto-completion-tab-key-behavior nil)
+
+(setq-default tab-always-indent t)
+
 (with-eval-after-load 'evil (pcl/overlay-add-hooks))
 (add-hook 'post-command-hook 'pcl/highlight-active-buffer)
 

@@ -323,6 +323,23 @@ By default, Spacemacs makes it so pressing ~fd~ quickly is the same as pressing 
   (use-package direnv :config (direnv-mode)))
 #+END_SRC
 
+** Autocomplete: don't complete with enter or tab
+It is infuriating to type ~[:tr RET~ and get ~[:trigger~ and other stupid nonsense.
+
+Tab is used to advance in snippets, which takes priority over completion, which is also infuriating when it happens, so better to just learn to use ~C-l~ always.
+
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(setq auto-completion-return-key-behavior nil
+      auto-completion-tab-key-behavior nil)
+#+END_SRC
+
+The above is not enough for tab, because ~tab-always-indent~ defaults to ~'complete~, which will autocomplete with helm. When ~t~ it will always indent, when ~nil~ it will indent if at the beginning of a line or insert a tab character otherwise.
+
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(setq-default tab-always-indent t)
+#+END_SRC
+
+
 
 * Highlight entire buffer based on evil mode
 
