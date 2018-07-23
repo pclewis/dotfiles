@@ -121,8 +121,8 @@ Alternative ideas:
 (with-eval-after-load 'cider
   (defun cider-repl--banner ()
     "Generate the welcome REPL buffer banner."
-    (let ((host (cider--connection-host (current-buffer)))
-          (port (cider--connection-port (current-buffer))))
+    (let ((host (plist-get nrepl-endpoint :host))
+          (port (plist-get nrepl-endpoint :port)))
       (format ";; Connected to nREPL server - nrepl://%s:%s
 ;; CIDER %s, nREPL %s
 ;; Clojure %s, Java %s"
