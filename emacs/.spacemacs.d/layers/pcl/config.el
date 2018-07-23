@@ -5,8 +5,8 @@
 (with-eval-after-load 'cider
   (defun cider-repl--banner ()
     "Generate the welcome REPL buffer banner."
-    (let ((host (cider--connection-host (current-buffer)))
-          (port (cider--connection-port (current-buffer))))
+    (let ((host (plist-get nrepl-endpoint :host))
+          (port (plist-get nrepl-endpoint :port)))
       (format ";; Connected to nREPL server - nrepl://%s:%s
 ;; CIDER %s, nREPL %s
 ;; Clojure %s, Java %s"
@@ -20,6 +20,9 @@
 (setq cider-lein-parameters "repl :headless :host localhost")
 
 (setq cider-jack-in-dependencies '(("nrepl" "0.3.1")))
+
+(setq cljr-inject-dependencies-at-jack-in nil)
+(add-to-list 'cider-jack-in-dependencies '("refactor-nrepl" "2.4.0-20180410.152833-6"))
 
 (setq ruby-align-chained-calls t)
 

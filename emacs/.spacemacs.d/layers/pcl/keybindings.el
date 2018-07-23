@@ -7,11 +7,11 @@
 (pcl/bind-clojure-keys "if" 'pcl-clojure/indent-defun)
 
 (pcl/bind-clojure-keys
-  "cm" 'clojure-convert-collection-to-map
-  "cs" 'clojure-convert-collection-to-set
-  "cl" 'clojure-convert-collection-to-list
+  "c{" 'clojure-convert-collection-to-map
+  "c#" 'clojure-convert-collection-to-set
+  "c(" 'clojure-convert-collection-to-list
   "c'" 'clojure-convert-collection-to-quoted-list
-  "cv" 'clojure-convert-collection-to-vector)
+  "c[" 'clojure-convert-collection-to-vector)
 
 (evil-define-key 'normal clojure-mode-map
   "(" 'sp-next-sexp
