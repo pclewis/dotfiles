@@ -615,6 +615,22 @@ https://www.reddit.com/r/emacs/comments/ad68zk/get_easytemplates_back_in_orgmode
   (add-to-list 'org-modules 'org-tempo))
 #+END_SRC
 
+** Fix company-mode popup with variable pitch
+company-posframe gives the candidate list its own window (requires emacs 26)
+
+#+begin_src emacs-lisp :tangle packages.el
+(unless (version< emacs-version "26")
+  (add-to-list 'pcl-packages '(company-posframe))
+  (defun pcl/init-company-posframe ()
+    (use-package company-posframe)
+    (company-posframe-mode 1)))
+#+end_src
+
+
+
+
+
+
 * Terminal fixes
 
 Not really using this stuff anymore.

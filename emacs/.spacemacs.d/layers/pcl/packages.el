@@ -23,3 +23,9 @@
   (use-package visual-fill-column))
 
 (add-to-list 'pcl-packages '(adaptive-wrap :excluded t))
+
+(unless (version< emacs-version "26")
+  (add-to-list 'pcl-packages '(company-posframe))
+  (defun pcl/init-company-posframe ()
+    (use-package company-posframe)
+    (company-posframe-mode 1)))
