@@ -222,12 +222,13 @@ Some paredit keys I can't unlearn.
 ** Forward/back expression 
 
 #+BEGIN_SRC emacs-lisp :tangle keybindings.el
-(define-key evil-lisp-state-map "L" 
-  (evil-lisp-state-enter-command sp-next-sexp))
-(define-key evil-lisp-state-map "a"
-  (lambda () (interactive)
-    (sp-forward-sexp)
-    (evil-insert-state)))
+(with-eval-after-load 'evil-lisp-state
+  (define-key evil-lisp-state-map "L"
+    (evil-lisp-state-enter-command sp-next-sexp))
+  (define-key evil-lisp-state-map "a"
+    (lambda () (interactive)
+      (sp-forward-sexp)
+      (evil-insert-state))))
 #+END_SRC
 
 ** Add optional count to insert-sexp-before and after

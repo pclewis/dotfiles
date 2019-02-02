@@ -37,12 +37,13 @@
 (define-key evil-insert-state-map (kbd "<C-left>")    'sp-forward-barf-sexp)
 (define-key evil-insert-state-map (kbd "C-k")         'sp-kill-sexp)
 
-(define-key evil-lisp-state-map "L" 
-  (evil-lisp-state-enter-command sp-next-sexp))
-(define-key evil-lisp-state-map "a"
-  (lambda () (interactive)
-    (sp-forward-sexp)
-    (evil-insert-state)))
+(with-eval-after-load 'evil-lisp-state
+  (define-key evil-lisp-state-map "L"
+    (evil-lisp-state-enter-command sp-next-sexp))
+  (define-key evil-lisp-state-map "a"
+    (lambda () (interactive)
+      (sp-forward-sexp)
+      (evil-insert-state))))
 
 (setq-default evil-escape-key-sequence "kjk")
 
