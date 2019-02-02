@@ -18,3 +18,7 @@ export QUOTING_STYLE=literal
 
 # direnv
 eval "$(direnv hook zsh)"
+
+# more history
+export HISTSIZE=100000
+export SAVEHIST=$HISTSIZE
