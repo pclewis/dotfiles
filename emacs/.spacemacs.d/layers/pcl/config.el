@@ -85,6 +85,9 @@
       (emacs-lisp . t)
       (clojure    . t))))
 
+(with-eval-after-load 'org
+  (add-to-list 'org-modules 'org-tempo))
+
 (when (and (string-equal system-type "gnu/linux")
            (file-directory-p "/run/current-system/sw/bin"))
   (setenv "PATH" (concat (getenv "PATH") ":/run/current-system/sw/bin"))

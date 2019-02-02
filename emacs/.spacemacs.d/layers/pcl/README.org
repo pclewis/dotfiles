@@ -606,6 +606,15 @@ Make tab key fix indentation inside of source blocks, instead of collapsing the 
   :evil-leader "tb")
 #+END_SRC
 
+** Bring back easy templates (org 9.1)
+https://youtu.be/u46CL0-gVTU
+https://www.reddit.com/r/emacs/comments/ad68zk/get_easytemplates_back_in_orgmode_92/
+
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(with-eval-after-load 'org
+  (add-to-list 'org-modules 'org-tempo))
+#+END_SRC
+
 * Terminal fixes
 
 Not really using this stuff anymore.
