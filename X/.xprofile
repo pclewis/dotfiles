@@ -27,6 +27,9 @@ hsetroot -solid '#666666'
 ## Use GPG as SSH Agent.
 export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
 
+## Sometimes this doesn't get set, which breaks systemctl --user. Have not figured out why.
+export XDG_RUNTIME_DIR="/run/user/$UID"
+
 ## Start systemd user services.
 systemctl --user import-environment DISPLAY DBUS_SESSION_BUS_ADDRESS
 systemctl --user start X.target
