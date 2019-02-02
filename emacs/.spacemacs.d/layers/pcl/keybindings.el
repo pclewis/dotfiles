@@ -52,6 +52,12 @@
   (lambda () (interactive)
     (avy-goto-char (string-to-char "("))))
 
+(define-key evil-insert-state-map (kbd "C-\"")
+  (lambda () (interactive) (sp-wrap-with-pair "\"")))
+
+(define-key evil-insert-state-map (kbd "C-(")
+  (lambda () (interactive) (sp-wrap-with-pair "(")))
+
 (spacemacs/set-leader-keys-for-major-mode 'org-mode
   "js" 'org-babel-demarcate-block)
 

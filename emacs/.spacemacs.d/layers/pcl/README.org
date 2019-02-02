@@ -333,6 +333,16 @@ The above is not enough for tab, because ~tab-always-indent~ defaults to ~'compl
 #+END_SRC
 
 
+** Wrapping from insert mode
+#+BEGIN_SRC emacs-lisp :tangle keybindings.el
+(define-key evil-insert-state-map (kbd "C-\"")
+  (lambda () (interactive) (sp-wrap-with-pair "\"")))
+
+(define-key evil-insert-state-map (kbd "C-(")
+  (lambda () (interactive) (sp-wrap-with-pair "(")))
+#+END_SRC
+
+
 
 * Highlight entire buffer based on evil mode
 
