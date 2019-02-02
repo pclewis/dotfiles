@@ -134,19 +134,6 @@ Alternative ideas:
               (cider--java-version)))))
 #+END_SRC
 
-** Use ipv4 for CIDER repl
-#+BEGIN_SRC emacs-lisp :tangle config.el
-(setq cider-lein-parameters "repl :headless :host localhost")
-
-(setq cider-jack-in-dependencies '(("nrepl" "0.3.1")))
-#+END_SRC
-
-** Use older refactor-nrepl version for Java 10 support
-#+BEGIN_SRC emacs-lisp :tangle config.el
-(setq cljr-inject-dependencies-at-jack-in nil)
-(add-to-list 'cider-jack-in-dependencies '("refactor-nrepl" "2.4.0-20180410.152833-6"))
-#+END_SRC
-
 ** Cider set repl ns
 #+BEGIN_SRC emacs-lisp :tangle keybindings.el
 (pcl/bind-clojure-keys "sS" 'cider-repl-set-ns)

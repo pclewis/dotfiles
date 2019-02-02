@@ -17,13 +17,6 @@
               (cider--clojure-version)
               (cider--java-version)))))
 
-(setq cider-lein-parameters "repl :headless :host localhost")
-
-(setq cider-jack-in-dependencies '(("nrepl" "0.3.1")))
-
-(setq cljr-inject-dependencies-at-jack-in nil)
-(add-to-list 'cider-jack-in-dependencies '("refactor-nrepl" "2.4.0-20180410.152833-6"))
-
 (setq ruby-align-chained-calls t)
 
 (with-eval-after-load 'smartparens
