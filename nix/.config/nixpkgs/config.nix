@@ -5,7 +5,7 @@
   packageOverrides = originalPackages:
   let
     newPackages = originalPackages.pkgs;
-    pclPackages = import <pclpkgs> {};
+    pclPackages = import /home/pcl/nixpkgs/default.nix;
   in {
 
     #-----------#
