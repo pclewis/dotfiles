@@ -116,7 +116,6 @@
         acpi
         ag
         anki
-        chromium
         compton
         direnv
         dmenu2
