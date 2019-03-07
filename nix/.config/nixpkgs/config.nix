@@ -94,6 +94,16 @@
         propagatedBuildInputs = origAttrs.propagatedBuildInputs ++ [ newPackages.jdk ];
     });
 
+    #--------------#
+    # libjpeg-java #
+    #--------------#
+    libjpeg-java = originalPackages.libjpeg.overrideAttrs( origAttrs: rec {
+        name = "${origAttrs.name}-java";
+        # cmakeFlags = [ "-DWITH_JAVA=1"];
+        configureFlags = [ "--with-java" ];
+        propagatedBuildInputs = [ newPackages.jdk ];
+    });
+
 
     #----------------------------------------#
     # Packages installed in user environment #
