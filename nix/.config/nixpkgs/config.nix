@@ -24,16 +24,16 @@
     # `doCheck = false` doesn't seem to work with override, so just redefine the
     # whole thing.
     #
-    hy = originalPackages.python35Packages.buildPythonApplication rec {
-      name = "hy-${version}";
-      version = "0.12.1";
-      src = originalPackages.fetchurl {
-        url = "mirror://pypi/h/hy/${name}.tar.gz";
-        sha256 = "1fjip998k336r26i1gpri18syvfjg7z46wng1n58dmc238wm53sx";
-      };
-      propagatedBuildInputs = with originalPackages.python35Packages; [ appdirs clint astor rply ];
-      doCheck = false;
-    };
+    # hy = originalPackages.python35Packages.buildPythonApplication rec {
+    #   name = "hy-${version}";
+    #   version = "0.12.1";
+    #   src = originalPackages.fetchurl {
+    #     url = "mirror://pypi/h/hy/${name}.tar.gz";
+    #     sha256 = "1fjip998k336r26i1gpri18syvfjg7z46wng1n58dmc238wm53sx";
+    #   };
+    #   propagatedBuildInputs = with originalPackages.python35Packages; [ appdirs clint astor rply ];
+    #   doCheck = false;
+    # };
 
     #----------------#
     # notify-desktop #
