@@ -39,6 +39,7 @@ import XMonad.Actions.ShowText
 import XMonad.Util.Run
 import XMonad.Util.EZConfig
 import XMonad.Layout.LayoutCombinators hiding ( (|||) )
+import XMonad.Layout.AvoidFloats
 import System.IO (hClose, hFlush, Handle)
 import Data.Maybe (fromMaybe, fromJust)
 
@@ -180,6 +181,7 @@ mainKeymap c = mkKeymap c $
     , ("M-=",          toSubmap c "screenKeymap" screenKeymap) -- Screen
     , ("M-s",          toSubmap c "shotKeymap" shotKeymap) -- Screen Shot
     , ("M-S-/",        toSubmap c "mainKeymap" []) -- Main Menu
+    , ("M-S-b",        sendMessage AvoidFloatToggle)
     ]
   where nextWindow      = windows W.focusDown
         prevWindow      = windows W.focusUp
@@ -243,6 +245,7 @@ gap = 8
 myLayout = gaps [(U,gap),(D,gap),(L,gap),(R,gap)] $ spacing gap $ smartBorders
   $   column
   ||| tiled
+  ||| avoidFloats (tiled)
   ||| Mirror tiled
   ||| Full
   ||| Dishes 1 (1/6)
