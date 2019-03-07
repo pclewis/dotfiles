@@ -1,6 +1,6 @@
 {
 
-  allowUnfree = true;
+  # allowUnfree = true;
 
   packageOverrides = originalPackages:
   let
