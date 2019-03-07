@@ -39,21 +39,21 @@
     # notify-desktop #
     #----------------#
     #
-    notify-desktop = originalPackages.stdenv.mkDerivation rec {
-      name = "notify-desktop-${version}";
-      version = "0.2.0-9863919";
-      src = originalPackages.fetchFromGitHub {
-        owner = "nowrep";
-        repo = "notify-desktop";
-        rev = "9863919fb4ce7820810ac14a09a46ee73c3d56cc";
-        sha256 = "1brcvl2fx0yzxj9mc8hzfl32zdka1f1bxpzsclcsjplyakyinr1a";
-      };
+    # notify-desktop = originalPackages.stdenv.mkDerivation rec {
+    #   name = "notify-desktop-${version}";
+    #   version = "0.2.0-9863919";
+    #   src = originalPackages.fetchFromGitHub {
+    #     owner = "nowrep";
+    #     repo = "notify-desktop";
+    #     rev = "9863919fb4ce7820810ac14a09a46ee73c3d56cc";
+    #     sha256 = "1brcvl2fx0yzxj9mc8hzfl32zdka1f1bxpzsclcsjplyakyinr1a";
+    #   };
 
-      postPatch = ''substituteInPlace src/Makefile --replace "/usr/bin" "$out/bin"'';
-      preInstall = ''mkdir -p $out/bin'';
+    #   postPatch = ''substituteInPlace src/Makefile --replace "/usr/bin" "$out/bin"'';
+    #   preInstall = ''mkdir -p $out/bin'';
 
-      buildInputs = [originalPackages.pkgconfig originalPackages.dbus];
-    };
+    #   buildInputs = [originalPackages.pkgconfig originalPackages.dbus];
+    # };
 
     #--------#
     # deepms #
