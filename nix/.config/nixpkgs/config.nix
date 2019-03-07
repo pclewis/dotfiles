@@ -59,27 +59,27 @@
     # deepms #
     #--------#
     #
-    ddccontrol = originalPackages.ddccontrol.overrideAttrs( origAttrs: rec {
-      postInstall = ''
-        cp src/config.h $out/include/ddccontrol/config.h
-      '';
-    });
+    # ddccontrol = originalPackages.ddccontrol.overrideAttrs( origAttrs: rec {
+    #   postInstall = ''
+    #     cp src/config.h $out/include/ddccontrol/config.h
+    #   '';
+    # });
 
-    deepms = originalPackages.stdenv.mkDerivation rec {
-      name = "deepms-${version}";
-      version = "0.0.1-76b87bb";
-      src = originalPackages.fetchFromGitHub {
-        owner = "pitkley";
-        repo = "deepms";
-        rev = "76b87bbb83b293d1ec570120a3a29f0b4dc76b23";
-        sha256 = "1hi44gs83bx8g3597l7aib5xxljmxszjwfl1k91kca80hksq8kxm";
-      };
+    # deepms = originalPackages.stdenv.mkDerivation rec {
+    #   name = "deepms-${version}";
+    #   version = "0.0.1-76b87bb";
+    #   src = originalPackages.fetchFromGitHub {
+    #     owner = "pitkley";
+    #     repo = "deepms";
+    #     rev = "76b87bbb83b293d1ec570120a3a29f0b4dc76b23";
+    #     sha256 = "1hi44gs83bx8g3597l7aib5xxljmxszjwfl1k91kca80hksq8kxm";
+    #   };
 
-      postPatch = ''
-        echo -e '\nINSTALL(TARGETS deepms DESTINATION ''${CMAKE_INSTALL_PREFIX}/bin)' >> CMakeLists.txt
-      '';
-      buildInputs = with originalPackages; [ cmake newPackages.ddccontrol libxml2 x11 xorg.libXext ];
-    };
+    #   postPatch = ''
+    #     echo -e '\nINSTALL(TARGETS deepms DESTINATION ''${CMAKE_INSTALL_PREFIX}/bin)' >> CMakeLists.txt
+    #   '';
+    #   buildInputs = with originalPackages; [ cmake newPackages.ddccontrol libxml2 x11 xorg.libXext ];
+    # };
 
     #-------------#
     # opencv-java #
