@@ -8,10 +8,13 @@
     pclPackages = import <pclpkgs> {};
   in {
 
-    #-----#
-    # jdk #
-    #-----#
-    jdk = pclPackages.jdk10;
+    #-----------#
+    # Use jdk11 #
+    #-----------#
+    jdk = newPackages.jdk11;
+
+    # except for libreoffice
+    libreoffice-args = originalPackages.libreoffice-args // { jdk = originalPackages.jdk; };
 
     #----#
     # hy #
