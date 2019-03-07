@@ -10,9 +10,6 @@ source ~/.zsh/vim.zsh
 # misc
 export EDITOR=vim
 
-# <@bigeasy> Shared history turns your shell history into a useless Twitter feed of what your alter egos are doing.
-setopt NO_SHARE_HISTORY
-
 # fix ls
 export QUOTING_STYLE=literal
 
@@ -20,5 +17,17 @@ export QUOTING_STYLE=literal
 eval "$(direnv hook zsh)"
 
 # more history
-export HISTSIZE=100000
+export HISTSIZE=1000000
 export SAVEHIST=$HISTSIZE
+
+# Save history from all terminals on execute
+setopt INC_APPEND_HISTORY
+
+# Add times to history
+setopt EXTENDED_HISTORY
+
+# Don't store commands starting with a space
+setopt HIST_IGNORE_SPACE
+
+# <@bigeasy> Shared history turns your shell history into a useless Twitter feed of what your alter egos are doing.
+setopt NO_SHARE_HISTORY
