@@ -89,7 +89,7 @@
         enableContrib = true;
     }).overrideAttrs( origAttrs: rec {
         name = "${origAttrs.name}-java";
-        cmakeFlags = origAttrs.cmakeFlags ++ ["-DBUILD_SHARED_LIBS=OFF"];
+        # cmakeFlags = origAttrs.cmakeFlags ++ ["-DBUILD_SHARED_LIBS=OFF"];
         buildInputs = origAttrs.buildInputs ++ [ originalPackages.ant originalPackages.pythonPackages.python ];
         propagatedBuildInputs = origAttrs.propagatedBuildInputs ++ [ newPackages.jdk ];
     });
