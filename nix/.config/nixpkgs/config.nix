@@ -104,6 +104,18 @@
         propagatedBuildInputs = [ newPackages.jdk ];
     });
 
+    #----------#
+    # xkcdpass #
+    #----------#
+    #
+    # xkcdpass = originalPackages.python36Packages.buildPythonPackage rec {
+    #     pname = "xkcdpass";
+    #     version = "1.16.5";
+    #     src = originalPackages.python36Packages.fetchPypi {
+    #         inherit pname version;
+    #         sha256 = "62961d24466964f4770bdbdbcca9ebdb148d0bdb48a8329c7bf41e9317dbb9d4";
+    #     };
+    # };
 
     #----------------------------------------#
     # Packages installed in user environment #
