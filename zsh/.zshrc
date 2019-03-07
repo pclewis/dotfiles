@@ -31,3 +31,6 @@ setopt HIST_IGNORE_SPACE
 
 # <@bigeasy> Shared history turns your shell history into a useless Twitter feed of what your alter egos are doing.
 setopt NO_SHARE_HISTORY
+
+# Don't clobber with redirection
+setopt NO_CLOBBER
